@@ -1,6 +1,7 @@
 #include <iostream>
 //include fstream for file oprations
 #include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -30,7 +31,7 @@ typedef struct Medicos {
 
 typedef struct Consultas {
 
-	unsigned int dni_pac;
+	string dni_pac;
 	string fecha_solicitado;
 	string fecha_turno;
 	bool presento;
@@ -38,7 +39,6 @@ typedef struct Consultas {
 	Medicos medico_consulta;
 
 } Consultas;
-
 
 typedef struct Contactos {
 
@@ -49,6 +49,7 @@ typedef struct Contactos {
 	string mail;
 
 } Contactos;
+
 
 void agregar_pacientes(Pacientes*& lista_pac, Pacientes paciente, int* tamactual) {
 	*tamactual = *tamactual + 1;
@@ -65,6 +66,7 @@ void agregar_pacientes(Pacientes*& lista_pac, Pacientes paciente, int* tamactual
 
 	return;
 }
+
 void agregar_medicos(Medicos*& lista_med, Medicos medico, int* tamactual) {
 	*tamactual = *tamactual + 1;
 	int i = 0;
@@ -112,6 +114,8 @@ void agregar_contactos(Contactos*& lista_cont, Contactos contacto, int* tamactua
 
 	return;
 }
+
+
 Pacientes* read_archivo_pacientes(string a1, int* contador) {
 	Pacientes* l_pac = new Pacientes[0];
 	Pacientes aux;
@@ -139,7 +143,7 @@ Pacientes* read_archivo_pacientes(string a1, int* contador) {
 
 	return l_pac;
 }
-
+ 
 Medicos* read_archivo_medicos(string a1, int* contador) {
 	Medicos* l_med = new Medicos[0];
 	Medicos aux;
@@ -182,7 +186,8 @@ Consultas* read_archivo_consultas(string a1, int* contador2) {
 	else {
 		fr >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy;
 		while (fr) {
-			fr >> aux.dni_pac >> coma >> aux.fecha_solicitado >> coma >> aux.fecha_turno >> coma >> aux.matricula_med >> coma >> aux.presento;
+			//dni_pac , fecha_solicitado , fecha_turno , presento , matricula_med
+			
 			//cout << aux.nombre << '\n';
 			agregar_consultas(l_cons, aux, &tamact);
 			*contador2 = *contador2 + 1;
@@ -193,7 +198,6 @@ Consultas* read_archivo_consultas(string a1, int* contador2) {
 
 	return l_cons;
 }
-
 
 Contactos* read_archivo_contactos(string a1, int* contador4) {
 	Contactos* l_cont = new Contactos[0];
@@ -222,6 +226,29 @@ Contactos* read_archivo_contactos(string a1, int* contador4) {
 
 	return l_cont;
 }
+
+void crear_archivo(string nombre_a1, string nombre_a2) {
+	fstream archi, archi2;
+
+	archi.open(nombre_a1, ios::out);
+	archi2.open(nombre_a2, ios::out);
+
+	if (archi.is_open() && archi2.is_open()) {
+		archi << "dni , nota1 , nota2" << endl;
+		archi << 1000 << " , " << 8 << " , " << 7 << endl;
+		archi << 10932 << " , " << 6 << " , " << 8 << endl;
+		archi2 << "dni , apellido , nombre" << endl;
+		archi2 << 10932 << " , Maradona , Diego" << endl;
+		archi2 << 1000 << " , Messi , Lionel" << endl;
+	}
+
+	archi.close();
+	archi2.close();
+
+	return;
+}
+
+
 int main()
 {
     fstream file; //object of fstream class
