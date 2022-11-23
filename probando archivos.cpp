@@ -347,26 +347,26 @@ int main()
 	Pacientes* lista5;
 	lista5 = read_archivo_pacientes_archivados("Pacientes_Archivados.csv");
 	
-	for (int i = 0; i < contador; i++) {
+	//los contador restan 1 porque sino imprime el ultimo 2 veces, ver si es solucion optima o no
+	for (int i = 0; i < contador-1; i++) {
 		cout << lista[i].dni << "," << lista[i].nombre << "," << lista[i].apellido << "," << lista[i].sexo << "," << lista[i].natalicio << "," << lista[i].estado << "," << lista[i].id_os << endl;
 	}
 
-	
-	for (int i = 0; i < contador2; i++) {
+	for (int i = 0; i < contador2-1; i++) {
 		cout << lista1[i].dni_pac << "," << lista1[i].fecha_solicitado << "," << lista1[i].fecha_turno << "," << lista1[i].presento << "," << lista1[i].matricula_med << endl;
 	}
-
-	for (int i = 0; i < contador3; i++) {
+	
+	for (int i = 0; i < contador3-1; i++) {
 		cout << lista2[i].matricula << "," << lista2[i].nombre << "," << lista2[i].apellido << "," << lista2[i].telefono << "," << lista2[i].especialidad << "," << lista2[i].activo  << endl;
 	}
 
-	for (int i = 0; i < contador4; i++) {
+	for (int i = 0; i < contador4-1; i++) {
 		cout << lista3[i].dni_pac << "," << lista3[i].telefono << "," << lista3[i].celular << "," << lista3[i].direccion << "," << lista3[i].mail << endl;
 	}
 	
 	cout << "Leyendo pacientes archivados:" << endl;
 	for (int i = 0; i < contador5; i++) {
-	  cout << lista5[i].dni << "," << lista5[i].nombre << "," << lista5[i].apellido << "," << lista5[i].sexo << "," << lista5[i].natalicio << "," << lista5[i].estado << "," << lista5[i].id_os << endl;
+	   cout << lista5[i].dni << "," << lista5[i].nombre << "," << lista5[i].apellido << "," << lista5[i].sexo << "," << lista5[i].natalicio << "," << lista5[i].estado << "," << lista5[i].id_os << endl;
 	}
 
 
