@@ -2,8 +2,43 @@
 //include fstream for file oprations
 #include <fstream>
 #include <string>
+#include <ctime>
+#include <time.h>
+#define _CRT_SECURE_NO_WARNINGS
 
 using namespace std;
+
+
+
+typedef struct Medicos {
+
+	string matricula;
+	string nombre;
+	string apellido;
+	string telefono;
+	string especialidad;
+	bool activo;
+} Medicos;
+
+typedef struct Consultas {
+
+	int dni_pac;
+	string fecha_solicitado;
+	string fecha_turno;
+	bool presento;
+	string matricula_med;
+
+} Consultas;
+
+typedef struct Contactos {
+
+	int dni_pac;
+	string telefono;
+	string celular;
+	string direccion;
+	string mail;
+
+} Contactos;
 
 typedef struct Pacientes {
 
@@ -18,37 +53,6 @@ typedef struct Pacientes {
 	//Consultas consulta;//consulta asociada, lee la del paciente
 
 }Pacientes;
-
-typedef struct Medicos {
-
-	string matricula;
-	string nombre;
-	string apellido;
-	string telefono;
-	string especialidad;
-	bool activo;
-} Medicos;
-
-typedef struct Consultas {
-
-	string dni_pac;
-	string fecha_solicitado;
-	string fecha_turno;
-	bool presento;
-	string matricula_med;
-	Medicos medico_consulta;
-
-} Consultas;
-
-typedef struct Contactos {
-
-	string dni_pac;
-	string telefono;
-	string celular;
-	string direccion;
-	string mail;
-
-} Contactos;
 
 
 void agregar_pacientes(Pacientes*& lista_pac, Pacientes paciente, int* tamactual) {
@@ -187,7 +191,7 @@ Consultas* read_archivo_consultas(string a1, int* contador2) {
 		fr >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy;
 		while (fr) {
 			//dni_pac , fecha_solicitado , fecha_turno , presento , matricula_med
-			
+			fr >> aux.dni_pac >> coma >> aux.fecha_solicitado >> coma >> aux.fecha_turno >> coma >> aux.presento >> coma >> aux.matricula_med;
 			//cout << aux.nombre << '\n';
 			agregar_consultas(l_cons, aux, &tamact);
 			*contador2 = *contador2 + 1;
@@ -284,7 +288,7 @@ Pacientes* archivar_pacientes(Pacientes*& lista_pac_a_archivar, int* contador5) 
 	*contador5 = tamactual;
 	return l_pac;
 }
-
+ 
 Pacientes* read_archivo_pacientes_archivados(string a1) {
 	Pacientes* l_pac = new Pacientes[0];
 	Pacientes aux;
@@ -312,6 +316,160 @@ Pacientes* read_archivo_pacientes_archivados(string a1) {
 	return l_pac;
 }
 
+int string_a_int(Consultas consulta) {
+	int i = 0;
+	int n = 0;
+	//char cadena[strlen(pac.natalicio)] = pac.natalicio;
+	string aux = consulta.fecha_solicitado;
+	int aux1 = aux.length();
+
+	char* cadena=new char[aux1];
+
+	while(i<aux1) {
+		if (aux[i] != '\0') {
+			cadena[i] = aux[i];
+		}
+		i++;
+	}
+
+	for (int indice = 0; indice < strlen(cadena); indice++)
+	{
+		char actual = cadena[indice];
+		if (actual != '\0') {
+			if (actual != '/') {
+				if (actual == '1' || actual == '2' || actual == '3' || actual == '4' || actual == '5' || actual == '6' || actual == '7' || actual == '8' || actual == '9' || actual == '0') {
+					n = 10 * n + (actual - '0');
+				}
+				
+			}
+		}
+		
+		//printf("Tenemos el caracter '%c'\n", actual);
+	}
+	
+	return n;
+	//int aux = 0;
+	//for (int i = 0; i < 3; i++) {
+		//aux = stoi(paciente.natalicio);
+	//}
+	//return aux;
+}
+
+/*void toInt(string cadena) {
+
+	time_t curr_time;
+	//char* tm = ctime(&curr_time);
+	time_t t = time(0);   // get time now
+	tm* now = localtime(&t);
+	curr_time = time(NULL);
+	int i = 0;
+	int j = 0;
+	//int dia,mes,anio;
+	string dia, mes, anio = "";
+	while (i < cadena.length()) {
+		char aux = cadena[i];
+		if (aux != '/') {
+			if (j == 0)
+				dia = dia + aux;
+			if (j == 1)
+				mes = mes + aux;
+			if (j == 2)
+				anio = anio + aux;
+		}
+		else {
+			j++;
+		}
+		i++;
+
+
+	}
+	now->tm_mday = dia;
+	now->tm_mon = mes;
+	now->tm_year = anio;
+
+	cout << "dia : " << now->tm_mday << endl;
+	cout << "mes : " << now->tm_mon << endl;
+	cout << "anio : " << now->tm_year << endl;
+
+
+
+}*/
+void toInt(string cadena) {
+	time_t t = time(0);   // get time now
+	//tm* ltm = localtime(&t);;
+	tm* ltm = (tm*)malloc(sizeof(tm));
+
+	int i = 0;
+	int j = 0;
+	//int dia,mes,anio;
+	string dia, mes, anio = "";
+	while (i < cadena.length()) {
+		char aux = cadena[i];
+		if (aux != '/') {
+			if (j == 0)
+				dia = dia + aux;
+			if (j == 1)
+				mes = mes + aux;
+			if (j == 2)
+				anio = anio + aux;
+		}
+		else {
+			j++;
+		}
+		i++;
+
+
+	}
+	ltm->tm_year = stoi(anio);
+	ltm->tm_mday = stoi(dia);
+	ltm->tm_mon = stoi(mes);
+	cout << "dia : " << ltm->tm_mday << endl;
+	cout << "mes : " << ltm->tm_mon << endl;
+	cout << "anio : " << ltm->tm_year << endl;
+
+
+
+}
+
+Consultas* filtrar_lista_por_dni(Consultas* lista_consultas, Pacientes pac, int* tamactual, int* tam) {
+	Consultas* l_cons = new Consultas[0];
+	int tamact = 0;
+
+	for (int i = 0; i < *tamactual; i++) {
+		if (pac.dni == lista_consultas[i].dni_pac) {
+			agregar_consultas(l_cons, lista_consultas[i], &tamact);
+			*tam = *tam + 1;
+		}
+	}
+	return l_cons;
+
+}
+
+int Encontrar_Consulta(Consultas* lista_consultas_filtradas, Pacientes pac, int* tamactual) {
+	Consultas* l_cons = new Consultas[*tamactual];
+	int aux1=0;
+	int aux2=0;
+
+	//l_cons = filtrar_lista_por_dni(lista_consultas, pac, tamactual);
+
+	aux1 = string_a_int(lista_consultas_filtradas[0]);
+
+	for (int i = 0; i < *tamactual; i++) {
+
+          aux2 = string_a_int(lista_consultas_filtradas[i]);
+
+		  if (aux1 < aux2) {
+			aux1 = aux2;
+		  }
+		
+
+	}
+
+	return aux2;
+}
+
+
+
 int main()
 {
     fstream file; //object of fstream class
@@ -326,6 +484,7 @@ int main()
 	int contador3 = 0;
 	int contador4 = 0;
 	int contador5 = 0;
+	int contador6 = 0;
 
 	Pacientes* lista;
 	lista=read_archivo_pacientes("Pacientes.csv", &contador);//con & transformo la variable en un puntero
@@ -346,12 +505,29 @@ int main()
 
 	Pacientes* lista5;
 	lista5 = read_archivo_pacientes_archivados("Pacientes_Archivados.csv");
-	
+
+	Consultas* lista_cons;
+
 	//los contador restan 1 porque sino imprime el ultimo 2 veces, ver si es solucion optima o no
 	for (int i = 0; i < contador-1; i++) {
 		cout << lista[i].dni << "," << lista[i].nombre << "," << lista[i].apellido << "," << lista[i].sexo << "," << lista[i].natalicio << "," << lista[i].estado << "," << lista[i].id_os << endl;
+		//int aux2 = string_a_int(lista[i]);
+		//cout << "Es: " << aux2 << endl;
+		lista_cons = filtrar_lista_por_dni(lista1, lista[i], &contador2, &contador6);
+
+		for (int j = 0; j < contador6; j++) {
+			cout << lista_cons[j].dni_pac << " , " << lista_cons[j].fecha_solicitado << endl;
+			toInt(lista_cons[j].fecha_solicitado);
+
+		}
+		/*
+		int aux3 = Encontrar_Consulta(lista_cons, lista[i], &contador6);
+		cout << "La consulta mas actual es: " << aux3 << endl;*/
+		contador6 = 0;
 	}
 
+	
+	//int aux = string_a_int(lista[1]);
 	for (int i = 0; i < contador2-1; i++) {
 		cout << lista1[i].dni_pac << "," << lista1[i].fecha_solicitado << "," << lista1[i].fecha_turno << "," << lista1[i].presento << "," << lista1[i].matricula_med << endl;
 	}
@@ -361,7 +537,7 @@ int main()
 	}
 
 	for (int i = 0; i < contador4-1; i++) {
-		cout << lista3[i].dni_pac << "," << lista3[i].telefono << "," << lista3[i].celular << "," << lista3[i].direccion << "," << lista3[i].mail << endl;
+		//cout << lista3[i].dni_pac << "," << lista3[i].telefono << "," << lista3[i].celular << "," << lista3[i].direccion << "," << lista3[i].mail << endl;
 	}
 	
 	cout << "Leyendo pacientes archivados:" << endl;
