@@ -394,7 +394,8 @@ int string_a_int(Consultas consulta) {
 
 
 }*/
-void toInt(string cadena) {
+
+tm* toInt(string cadena) {
 	time_t t = time(0);   // get time now
 	//tm* ltm = localtime(&t);;
 	tm* ltm = (tm*)malloc(sizeof(tm));
@@ -423,11 +424,11 @@ void toInt(string cadena) {
 	ltm->tm_year = stoi(anio);
 	ltm->tm_mday = stoi(dia);
 	ltm->tm_mon = stoi(mes);
-	cout << "dia : " << ltm->tm_mday << endl;
-	cout << "mes : " << ltm->tm_mon << endl;
-	cout << "anio : " << ltm->tm_year << endl;
+	//cout << "dia : " << ltm->tm_mday << endl;
+	//cout << "mes : " << ltm->tm_mon << endl;
+	//cout << "anio : " << ltm->tm_year << endl;
 
-
+	return ltm;
 
 }
 
@@ -445,27 +446,30 @@ Consultas* filtrar_lista_por_dni(Consultas* lista_consultas, Pacientes pac, int*
 
 }
 
-int Encontrar_Consulta(Consultas* lista_consultas_filtradas, Pacientes pac, int* tamactual) {
+tm* Encontrar_Consulta(Consultas* lista_consultas_filtradas, Pacientes pac, int* tamactual) {
 	Consultas* l_cons = new Consultas[*tamactual];
-	int aux1=0;
-	int aux2=0;
+	tm* aux1=0;
+	tm* aux2=0;
 
 	//l_cons = filtrar_lista_por_dni(lista_consultas, pac, tamactual);
 
-	aux1 = string_a_int(lista_consultas_filtradas[0]);
+	aux1 = toInt(lista_consultas_filtradas[0].fecha_solicitado);
 
 	for (int i = 0; i < *tamactual; i++) {
 
-          aux2 = string_a_int(lista_consultas_filtradas[i]);
+          aux2 = toInt(lista_consultas_filtradas[i].fecha_solicitado);
+		  //aux1.año=1980 aux1.mes= 7 aux1.dia=20
+		  //aux2.año=1982 aux2.mes=8  aux1.dia=24
 
-		  if (aux1 < aux2) {
-			aux1 = aux2;
-		  }
-		
-
+		  if (aux1->tm_year < aux2->tm_year)
+			  aux1 = aux2;
+		  else if (aux1->tm_year < aux2->tm_year && aux1->tm_mon < aux2->tm_mon) 
+			  aux1 = aux2;
+		  else if (aux1->tm_year < aux2->tm_year && aux1->tm_mon < aux2->tm_mon && aux1->tm_mday < aux2->tm_mday)
+			  aux1 = aux2;
 	}
 
-	return aux2;
+	return aux1;
 }
 
 
@@ -513,17 +517,24 @@ int main()
 		cout << lista[i].dni << "," << lista[i].nombre << "," << lista[i].apellido << "," << lista[i].sexo << "," << lista[i].natalicio << "," << lista[i].estado << "," << lista[i].id_os << endl;
 		//int aux2 = string_a_int(lista[i]);
 		//cout << "Es: " << aux2 << endl;
+
 		lista_cons = filtrar_lista_por_dni(lista1, lista[i], &contador2, &contador6);
-
 		for (int j = 0; j < contador6; j++) {
-			cout << lista_cons[j].dni_pac << " , " << lista_cons[j].fecha_solicitado << endl;
-			toInt(lista_cons[j].fecha_solicitado);
-
+			cout << lista_cons[j].dni_pac << " , " << lista_cons[j].fecha_solicitado << ", " << lista_cons[j].fecha_turno << endl;
+			tm* aux8;
+			aux8 = toInt(lista_cons[j].fecha_solicitado);
+			//cout << "Dia: " << aux8->tm_mday << " Mes: " << aux8->tm_mon << " Anio: " << aux8->tm_year << endl;
 		}
-		/*
-		int aux3 = Encontrar_Consulta(lista_cons, lista[i], &contador6);
-		cout << "La consulta mas actual es: " << aux3 << endl;*/
+		tm* aux3 = Encontrar_Consulta(lista_cons, lista[i], &contador6);
+		cout << "La consulta mas actual es: " << aux3->tm_mday << ", " << aux3->tm_mon << ", " << aux3->tm_year << endl;
+		
 		contador6 = 0;
+
+		
+
+		//int aux3 = Encontrar_Consulta(lista_cons, lista[i], &contador6);
+		//cout << "La consulta mas actual es: " << aux3 << endl;*/
+		//contador6 = 0;
 	}
 
 	
@@ -537,7 +548,7 @@ int main()
 	}
 
 	for (int i = 0; i < contador4-1; i++) {
-		//cout << lista3[i].dni_pac << "," << lista3[i].telefono << "," << lista3[i].celular << "," << lista3[i].direccion << "," << lista3[i].mail << endl;
+		cout << lista3[i].dni_pac << "," << lista3[i].telefono << "," << lista3[i].celular << "," << lista3[i].direccion << "," << lista3[i].mail << endl;
 	}
 	
 	cout << "Leyendo pacientes archivados:" << endl;
