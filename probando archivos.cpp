@@ -446,7 +446,7 @@ Consultas* filtrar_lista_por_dni(Consultas* lista_consultas, Pacientes pac, int*
 
 }
 
-tm* Encontrar_Consulta(Consultas* lista_consultas_filtradas, Pacientes pac, int* tamactual) {
+tm* Encontrar_Consulta_Fecha(Consultas* lista_consultas_filtradas, int* tamactual) {
 	Consultas* l_cons = new Consultas[*tamactual];
 	tm* aux1=0;
 	tm* aux2=0;
@@ -472,6 +472,76 @@ tm* Encontrar_Consulta(Consultas* lista_consultas_filtradas, Pacientes pac, int*
 	return aux1;
 }
 
+Consultas encontrar_ultima_consulta(Consultas* lista_consultas_filtradas, int* tamactual) {
+	Consultas aux;
+	tm* aux1;
+	tm* aux2;
+
+	aux1 = toInt(lista_consultas_filtradas[0].fecha_solicitado);
+
+	for (int i = 0; i < *tamactual; i++) {
+
+		aux2 = toInt(lista_consultas_filtradas[i].fecha_solicitado);
+		//aux1.año=1980 aux1.mes= 7 aux1.dia=20
+		//aux2.año=1982 aux2.mes=8  aux1.dia=24
+
+		if (aux1->tm_year < aux2->tm_year) {
+			aux1 = aux2;
+			aux = lista_consultas_filtradas[i];
+		}
+		else if (aux1->tm_year < aux2->tm_year && aux1->tm_mon < aux2->tm_mon) {
+			aux1 = aux2;
+			aux = lista_consultas_filtradas[i];
+		}
+		else if (aux1->tm_year < aux2->tm_year && aux1->tm_mon < aux2->tm_mon && aux1->tm_mday < aux2->tm_mday) {
+			aux1 = aux2;
+			aux = lista_consultas_filtradas[i];
+		}
+	}
+
+	return aux;
+
+}
+
+Medicos* Buscar_Medico_Viejo(Medicos* Lista_Medicos, Consultas* lista_consultas, int* contador6, int*tam) {
+
+	Consultas ultima_consulta = encontrar_ultima_consulta(lista_consultas, contador6);
+	Medicos* aux=NULL;
+
+	for (int i = 0; i < *tam; i++) {
+		if (ultima_consulta.matricula_med == Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
+			//si encuentra al medico que lo habia atendido antes y este se encuentra disponible, misma especialidad???
+			aux = &Lista_Medicos[i]; //encontramos al medico
+			return aux;
+		}
+	}
+	return aux;//retornamos el struct del medico, significa que se puede asignar turno con el medico 
+}
+
+Medicos* Buscar_Medico_Nuevo(Medicos* Lista_Medicos, Consultas* lista_consultas, int* contador6, int* tam) {
+
+	Consultas ultima_consulta = encontrar_ultima_consulta(lista_consultas, contador6);
+	Medicos* aux = NULL;
+
+	Medicos* medico_ultima_consulta = Buscar_Medico_Viejo(Lista_Medicos, lista_consultas, contador6, tam);
+	for (int i = 0; i < *tam; i++) {
+		//int respuesta_agenda_llena = rand() % 2;
+		if (medico_ultima_consulta != NULL) {
+			if (ultima_consulta.matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true && medico_ultima_consulta->especialidad == Lista_Medicos[i].especialidad) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
+				//si encuentra al medico que lo habia atendido antes y este se encuentra disponible, misma especialidad???
+				aux = &Lista_Medicos[i]; //encontramos al medico
+			}
+		}
+		else
+			if (ultima_consulta.matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
+				//si encuentra al medico que lo habia atendido antes y este se encuentra disponible, misma especialidad???
+				aux = &Lista_Medicos[i]; //encontramos al medico
+				return aux;
+			}
+
+	}
+	return aux;//retornamos el struct del medico, significa que se puede asignar turno con el medico 
+}
 
 
 int main()
@@ -511,7 +581,8 @@ int main()
 	lista5 = read_archivo_pacientes_archivados("Pacientes_Archivados.csv");
 
 	Consultas* lista_cons;
-
+	Medicos* medico_nueva_consulta;
+	Medicos* medico_nueva_consulta_nuevo;
 	//los contador restan 1 porque sino imprime el ultimo 2 veces, ver si es solucion optima o no
 	for (int i = 0; i < contador-1; i++) {
 		cout << lista[i].dni << "," << lista[i].nombre << "," << lista[i].apellido << "," << lista[i].sexo << "," << lista[i].natalicio << "," << lista[i].estado << "," << lista[i].id_os << endl;
@@ -525,12 +596,37 @@ int main()
 			aux8 = toInt(lista_cons[j].fecha_solicitado);
 			//cout << "Dia: " << aux8->tm_mday << " Mes: " << aux8->tm_mon << " Anio: " << aux8->tm_year << endl;
 		}
-		tm* aux3 = Encontrar_Consulta(lista_cons, lista[i], &contador6);
+		tm* aux3 = Encontrar_Consulta_Fecha(lista_cons, &contador6);
 		cout << "La consulta mas actual es: " << aux3->tm_mday << ", " << aux3->tm_mon << ", " << aux3->tm_year << endl;
 		
-		contador6 = 0;
+		medico_nueva_consulta = Buscar_Medico_Viejo(lista2, lista_cons, &contador6, &contador3);
 
-		
+		if (medico_nueva_consulta != NULL) {
+			cout << "Encontramos al medico de su ultima consulta, sus datos son: " << endl;
+			cout << "Matricula: " << medico_nueva_consulta->matricula << " Apellido: " << medico_nueva_consulta->apellido << " Nombre: " << medico_nueva_consulta->nombre << " Especialidad: " << medico_nueva_consulta->especialidad << endl;
+		}
+		else {
+			cout << "No se ha encontrado al medico." << endl;
+			cout << "Desea buscar otro medico? " << endl;
+
+			int respuesta = rand() % 2;
+
+			if (respuesta == 1) {
+				cout << "Ha decidido buscar otro medico: " << endl;
+				medico_nueva_consulta_nuevo = Buscar_Medico_Nuevo(lista2, lista_cons, &contador6, &contador3);
+
+				if (medico_nueva_consulta_nuevo != NULL) {
+					cout << "Encontramos al medico de su ultima consulta, sus datos son: " << endl;
+					cout << "Matricula: " << medico_nueva_consulta_nuevo->matricula << " Apellido: " << medico_nueva_consulta_nuevo->apellido << " Nombre: " << medico_nueva_consulta_nuevo->nombre << " Especialidad: " << medico_nueva_consulta_nuevo->especialidad << endl;
+				}
+				else
+					cout << "No se ha encontrado al medico." << endl;
+			}
+			else
+				cout << "El paciente ha decidido no buscar otro medido" << endl;
+		}
+			
+		contador6 = 0;
 
 		//int aux3 = Encontrar_Consulta(lista_cons, lista[i], &contador6);
 		//cout << "La consulta mas actual es: " << aux3 << endl;*/
