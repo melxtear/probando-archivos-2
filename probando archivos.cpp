@@ -1,14 +1,16 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 //include fstream for file oprations
 #include <fstream>
 #include <string>
 #include <ctime>
 #include <time.h>
-#define _CRT_SECURE_NO_WARNINGS
-
+#include <sstream>
+#include <iostream>
+#include <stdio.h>
+#include <chrono>
+#include <iomanip>
 using namespace std;
-
-
 
 typedef struct Medicos {
 
@@ -18,6 +20,7 @@ typedef struct Medicos {
 	string telefono;
 	string especialidad;
 	bool activo;
+
 } Medicos;
 
 typedef struct Consultas {
@@ -49,7 +52,7 @@ typedef struct Pacientes {
 	string natalicio;
 	string estado;
 	string id_os;
-	//Contactos contacto;//tendria que tener 2? uno de emergencia y otra dle mismo paciente
+	Contactos contacto;//tendria que tener 2? uno de emergencia y otra dle mismo paciente
 	//Consultas consulta;//consulta asociada, lee la del paciente
 
 }Pacientes;
@@ -317,12 +320,13 @@ Pacientes* read_archivo_pacientes_archivados(string a1) {
 }
 
 //fue la primer idea para pasar de string a int, retornaba la fecha como int (ver si puede llegar a servir)
-int string_a_int(Consultas consulta) {
+int string_a_int(string fecha) {
 	int i = 0;
 	int n = 0;
 	//char cadena[strlen(pac.natalicio)] = pac.natalicio;
-	string aux = consulta.fecha_solicitado;
-	int aux1 = aux.length();
+	//string aux = consulta.fecha_solicitado;
+	string aux = fecha;
+	int aux1 = fecha.length();
 
 	char* cadena=new char[aux1];
 
@@ -534,6 +538,7 @@ Medicos* Buscar_Medico_Nuevo(Medicos* Lista_Medicos, Consultas* lista_consultas,
 			if (ultima_consulta.matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true && medico_ultima_consulta->especialidad == Lista_Medicos[i].especialidad) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
 				//si encuentra al medico que lo habia atendido antes y este se encuentra disponible, misma especialidad???
 				aux = &Lista_Medicos[i]; //encontramos al medico
+				return aux;
 			}
 		}
 		else
@@ -545,6 +550,87 @@ Medicos* Buscar_Medico_Nuevo(Medicos* Lista_Medicos, Consultas* lista_consultas,
 
 	}
 	return aux;//retornamos el struct del medico, significa que se puede asignar turno con el medico 
+}
+
+//Consultas* lista_consultas_filtradas, int* tamactual
+
+bool Verificar_Anio_Ultima_Consulta(tm* fecha_ultima_consulta) {
+	
+	//time_t curr_time;
+	//curr_time = time(NULL);
+
+	//char* tm = ctime(&curr_time);
+	//cout << "Today is : " << tm;
+	
+	//auto now = chrono::system_clock::now();
+	//auto time = chrono::system_clock::to_time_t(now);
+
+	//cout << put_time(localtime(&time), "%Y");
+
+	/*time_t p = time(0);   // get time now
+	tm* now = localtime(&p);
+	cout << now->tm_mday << ", " << now->tm_mon << ", " << now->tm_year << endl;*/
+
+	char s[100];
+	int rc;
+	time_t temp;
+	struct tm* timeptr;
+
+	temp = time(NULL);
+	timeptr = localtime(&temp);
+
+	//"Today is %A, %b %d %Y.\nTime:  %r"
+	rc = strftime(s, sizeof(s), "%d/%m/%Y", timeptr);
+	//printf("%d characters written.\n%s\n", rc, s);
+	//cout << "Separacion: " << endl;
+	//cout << s << endl;
+	//tm* now2 = localtime(&t);
+	//int aux1 = string_a_int(s);
+	tm* aux2 = toInt(s);
+
+	//cout << aux1 << endl;
+	cout << aux2->tm_mday << ", " << aux2->tm_mon << ", " << aux2->tm_year << endl;
+
+	time_t t = time(0);
+	tm* nuevo= localtime(&t);
+	nuevo->tm_year = (aux2->tm_year) - (fecha_ultima_consulta->tm_year);
+
+	cout << nuevo->tm_year << endl;
+
+	if (nuevo->tm_year < 10) {
+		return true;
+		//ok, la diferencia de año es menor a 10 o sea es un paciente recuperable, podemos llamar
+	}
+	else if (nuevo->tm_year == 10) { //la diferencia de año es 10, está al limite
+		if (fecha_ultima_consulta->tm_mon > aux2->tm_mon) { //vemos si el mes de la ultima consulta es mayor
+			return true;
+			//ok, el mes de la consulta es mayor, ej 11/2022-12/2012, significa que todavia no llegaron a ser 10 años 
+			//justos de su ultima consulta, por eso es un paciente recuperable, podemos llamarlo
+		}
+		else if (fecha_ultima_consulta->tm_mon == aux2->tm_mon) { //el mes es igua, está al limit
+			if (fecha_ultima_consulta->tm_mday >= aux2->tm_mday) { 
+				return true;
+				//todavia no se cumplieron los 10 años o se cumplieron los 10 años justo ese dia
+				//pero es un paciente recuperable, podemos llamarlo
+			}
+			else//el dia de la ultima consulta es mas chico, se supero el limite
+				return false;
+			//ya se cumplieron los 10 años, es un paciente irrecuperable, procedemos a archivarlo
+
+		}
+		else if (fecha_ultima_consulta->tm_mon < aux2->tm_mon) {////el mes de ultima consulta es mas chico, supero limite
+			//ya se cumplieron los 10 años, es un paciente irrecuperable, procedemos a archivarlo
+			return false;
+		}
+	}
+	else//la diferencia de años es mayor a los 10, se supero el limite
+		return false;
+		//ya se cumplieron los 10 años, es un paciente irrecuperable, procedemos a archivarlo
+
+	//cout << "dia : " << ltm->tm_mday << endl;
+	//cout << "mes : " << ltm->tm_mon << endl;
+	//cout << "anio : " << ltm->tm_year << endl;
+
 }
 
 
@@ -587,6 +673,7 @@ int main()
 	Consultas* lista_cons;
 	Medicos* medico_nueva_consulta;
 	Medicos* medico_nueva_consulta_nuevo;
+
 	//los contador restan 1 porque sino imprime el ultimo 2 veces, ver si es solucion optima o no
 	for (int i = 0; i < contador-1; i++) {
 		cout << lista[i].dni << "," << lista[i].nombre << "," << lista[i].apellido << "," << lista[i].sexo << "," << lista[i].natalicio << "," << lista[i].estado << "," << lista[i].id_os << endl;
@@ -595,7 +682,7 @@ int main()
 
 		lista_cons = filtrar_lista_por_dni(lista1, lista[i], &contador2, &contador6);
 		for (int j = 0; j < contador6; j++) {
-			cout << lista_cons[j].dni_pac << " , " << lista_cons[j].fecha_solicitado << ", " << lista_cons[j].fecha_turno << endl;
+			cout << lista_cons[j].dni_pac << " , " << lista_cons[j].fecha_solicitado << ", " << lista_cons[j].fecha_turno << ", " << lista_cons[j].presento << endl;
 			tm* aux8;
 			aux8 = toInt(lista_cons[j].fecha_solicitado);
 			//cout << "Dia: " << aux8->tm_mday << " Mes: " << aux8->tm_mon << " Anio: " << aux8->tm_year << endl;
@@ -603,32 +690,57 @@ int main()
 		tm* aux3 = Encontrar_Consulta_Fecha(lista_cons, &contador6);
 		cout << "La consulta mas actual es: " << aux3->tm_mday << ", " << aux3->tm_mon << ", " << aux3->tm_year << endl;
 		
-		medico_nueva_consulta = Buscar_Medico_Viejo(lista2, lista_cons, &contador6, &contador3);
+		bool verificacion=Verificar_Anio_Ultima_Consulta(aux3);
 
-		if (medico_nueva_consulta != NULL) {
-			cout << "Encontramos al medico de su ultima consulta, sus datos son: " << endl;
-			cout << "Matricula: " << medico_nueva_consulta->matricula << " Apellido: " << medico_nueva_consulta->apellido << " Nombre: " << medico_nueva_consulta->nombre << " Especialidad: " << medico_nueva_consulta->especialidad << endl;
-		}
-		else {
-			cout << "No se ha encontrado al medico." << endl;
-			cout << "Desea buscar otro medico? " << endl;
+		if (verificacion) {
+			cout << "Paciente recuperable, procedemos a asignar turno." << endl;
 
-			int respuesta = rand() % 2;
+			cout << "Desea un turno con el medico de su ultima consulta?" << endl;
+			int respuesta1 = rand() % 2;
+			if (respuesta1 == 1) {
+				medico_nueva_consulta = Buscar_Medico_Viejo(lista2, lista_cons, &contador6, &contador3);
 
-			if (respuesta == 1) {
-				cout << "Ha decidido buscar otro medico: " << endl;
+				if (medico_nueva_consulta != NULL) {
+					cout << "Encontramos al medico de su ultima consulta, sus datos son: " << endl;
+					cout << "Matricula: " << medico_nueva_consulta->matricula << " Apellido: " << medico_nueva_consulta->apellido << " Nombre: " << medico_nueva_consulta->nombre << " Especialidad: " << medico_nueva_consulta->especialidad << endl;
+				}
+				else {
+					cout << "No se ha encontrado al medico." << endl;
+					cout << "Desea buscar otro medico? " << endl;
+
+					int respuesta2 = rand() % 2;
+
+					if (respuesta2 == 1) {
+						cout << "Ha decidido buscar otro medico: " << endl;
+						medico_nueva_consulta_nuevo = Buscar_Medico_Nuevo(lista2, lista_cons, &contador6, &contador3);
+
+						if (medico_nueva_consulta_nuevo != NULL) {
+							cout << "Encontramos un nuevo medico, sus datos son: " << endl;
+							cout << "Matricula: " << medico_nueva_consulta_nuevo->matricula << " Apellido: " << medico_nueva_consulta_nuevo->apellido << " Nombre: " << medico_nueva_consulta_nuevo->nombre << " Especialidad: " << medico_nueva_consulta_nuevo->especialidad << endl;
+						}
+						else
+							cout << "No se ha encontrado al medico nuevo." << endl;
+					}
+					else
+						cout << "El paciente ha decidido no buscar otro medido" << endl;
+				}
+			}
+			else {
+				cout << "Ha decidido no asignar turno con su ultimo medico, procedemos a buscar un nuevo. " << endl;
+				
 				medico_nueva_consulta_nuevo = Buscar_Medico_Nuevo(lista2, lista_cons, &contador6, &contador3);
 
-				if (medico_nueva_consulta_nuevo != NULL) {
-					cout << "Encontramos un nuevo medico, sus datos son: " << endl;
-					cout << "Matricula: " << medico_nueva_consulta_nuevo->matricula << " Apellido: " << medico_nueva_consulta_nuevo->apellido << " Nombre: " << medico_nueva_consulta_nuevo->nombre << " Especialidad: " << medico_nueva_consulta_nuevo->especialidad << endl;
-				}
-				else
-					cout << "No se ha encontrado al medico." << endl;
+					if (medico_nueva_consulta_nuevo != NULL) {
+						cout << "Encontramos un nuevo medico, sus datos son: " << endl;
+						cout << "Matricula: " << medico_nueva_consulta_nuevo->matricula << " Apellido: " << medico_nueva_consulta_nuevo->apellido << " Nombre: " << medico_nueva_consulta_nuevo->nombre << " Especialidad: " << medico_nueva_consulta_nuevo->especialidad << endl;
+					}
+					else
+						cout << "No se ha encontrado al medico nuevo." << endl;
 			}
-			else
-				cout << "El paciente ha decidido no buscar otro medido" << endl;
+			
 		}
+		else
+			cout << "Paciente irrecuperable, no se puede volver a asignar turno. Procedemos a archivar" << endl;
 			
 		contador6 = 0;
 
@@ -656,7 +768,7 @@ int main()
 	   cout << lista5[i].dni << "," << lista5[i].nombre << "," << lista5[i].apellido << "," << lista5[i].sexo << "," << lista5[i].natalicio << "," << lista5[i].estado << "," << lista5[i].id_os << endl;
 	}
 
-
+	
     //If file is not created, return error
     if (!file) {
         cout << "Error in file creation!";
