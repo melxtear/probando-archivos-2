@@ -316,6 +316,7 @@ Pacientes* read_archivo_pacientes_archivados(string a1) {
 	return l_pac;
 }
 
+//fue la primer idea para pasar de string a int, retornaba la fecha como int (ver si puede llegar a servir)
 int string_a_int(Consultas consulta) {
 	int i = 0;
 	int n = 0;
@@ -353,7 +354,7 @@ int string_a_int(Consultas consulta) {
 		//aux = stoi(paciente.natalicio);
 	//}
 	//return aux;
-}
+} 
 
 /*void toInt(string cadena) {
 
@@ -395,6 +396,7 @@ int string_a_int(Consultas consulta) {
 
 }*/
 
+//convierte un string de fecha en una fecha ctime
 tm* toInt(string cadena) {
 	time_t t = time(0);   // get time now
 	//tm* ltm = localtime(&t);;
@@ -446,6 +448,7 @@ Consultas* filtrar_lista_por_dni(Consultas* lista_consultas, Pacientes pac, int*
 
 }
 
+//retorna fecha ctime de ultima consulta
 tm* Encontrar_Consulta_Fecha(Consultas* lista_consultas_filtradas, int* tamactual) {
 	Consultas* l_cons = new Consultas[*tamactual];
 	tm* aux1=0;
@@ -472,6 +475,7 @@ tm* Encontrar_Consulta_Fecha(Consultas* lista_consultas_filtradas, int* tamactua
 	return aux1;
 }
 
+//retorna struct de ultima consulta
 Consultas encontrar_ultima_consulta(Consultas* lista_consultas_filtradas, int* tamactual) {
 	Consultas aux;
 	tm* aux1;
@@ -525,7 +529,7 @@ Medicos* Buscar_Medico_Nuevo(Medicos* Lista_Medicos, Consultas* lista_consultas,
 
 	Medicos* medico_ultima_consulta = Buscar_Medico_Viejo(Lista_Medicos, lista_consultas, contador6, tam);
 	for (int i = 0; i < *tam; i++) {
-		//int respuesta_agenda_llena = rand() % 2;
+		int respuesta_agenda_llena = rand() % 2;
 		if (medico_ultima_consulta != NULL) {
 			if (ultima_consulta.matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true && medico_ultima_consulta->especialidad == Lista_Medicos[i].especialidad) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
 				//si encuentra al medico que lo habia atendido antes y este se encuentra disponible, misma especialidad???
@@ -533,7 +537,7 @@ Medicos* Buscar_Medico_Nuevo(Medicos* Lista_Medicos, Consultas* lista_consultas,
 			}
 		}
 		else
-			if (ultima_consulta.matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
+			if (ultima_consulta.matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true && respuesta_agenda_llena==0) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
 				//si encuentra al medico que lo habia atendido antes y este se encuentra disponible, misma especialidad???
 				aux = &Lista_Medicos[i]; //encontramos al medico
 				return aux;
@@ -616,7 +620,7 @@ int main()
 				medico_nueva_consulta_nuevo = Buscar_Medico_Nuevo(lista2, lista_cons, &contador6, &contador3);
 
 				if (medico_nueva_consulta_nuevo != NULL) {
-					cout << "Encontramos al medico de su ultima consulta, sus datos son: " << endl;
+					cout << "Encontramos un nuevo medico, sus datos son: " << endl;
 					cout << "Matricula: " << medico_nueva_consulta_nuevo->matricula << " Apellido: " << medico_nueva_consulta_nuevo->apellido << " Nombre: " << medico_nueva_consulta_nuevo->nombre << " Especialidad: " << medico_nueva_consulta_nuevo->especialidad << endl;
 				}
 				else
