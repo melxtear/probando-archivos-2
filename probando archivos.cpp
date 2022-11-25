@@ -248,7 +248,9 @@ Contactos* read_archivo_contactos(string a1, int* contador4) {
 	else {
 		fr >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy;
 		while (fr) {
-			fr >> aux.dni_pac >> coma >> aux.telefono >> coma >> aux.celular >> coma >> aux.direccion >> coma >> aux.mail;
+			fr >> aux.dni_pac >> coma >> aux.telefono >> coma >> aux.celular >> coma;
+			getline(fr, aux.direccion, ',');
+			fr >> aux.mail;
 			//cout << aux.nombre << '\n';
 			agregar_contactos(l_cont, aux, &tamact);
 			*contador4 = *contador4 + 1;
