@@ -79,7 +79,7 @@ typedef struct Pacientes {
 	string natalicio;
 	string estado;
 	string id_os;
-	Contactos contacto;//tendria que tener 2? uno de emergencia y otra dle mismo paciente
+	//Contactos contacto;//tendria que tener 2? uno de emergencia y otra dle mismo paciente
 	//Consultas consulta;//consulta asociada, lee la del paciente
 
 }Pacientes;
