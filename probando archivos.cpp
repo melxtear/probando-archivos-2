@@ -85,7 +85,7 @@ typedef struct Pacientes {
 
 }Pacientes;
 
-void resize(Consultas*& lista_cons, int* tamactual, int cantidad_aumentar) {
+/*void resize(Consultas*& lista_cons, int* tamactual, int cantidad_aumentar) {
 	*tamactual = *tamactual + cantidad_aumentar;
 	int i = 0;
 	Consultas* aux = new Consultas[*tamactual];
@@ -98,7 +98,7 @@ void resize(Consultas*& lista_cons, int* tamactual, int cantidad_aumentar) {
 	lista_cons = aux;
 
 	return;
-}
+}*/
 
 void agregar_pacientes(Pacientes*& lista_pac, Pacientes paciente, int* tamactual) {
 	*tamactual = *tamactual + 1;
@@ -278,7 +278,7 @@ Contactos* read_archivo_contactos(string a1, int* contador4) {
 	return l_cont;
 }
 
-
+//no funca
 void crear_archivo_consultas_nuevas(string nombre_a1, Consultas*& lista_consultas_nuevas, int* tamactual) {
 	fstream archi;
 
@@ -788,7 +788,7 @@ int Verificar_Anio_Ultima_Consulta(tm* fecha_ultima_consulta) {
 	tm* nuevo= localtime(&t);
 	nuevo->tm_year = (aux2->tm_year) - (fecha_ultima_consulta->tm_year);
 
-	cout << nuevo->tm_year << endl;
+	cout << "Diferencia de años: " << nuevo->tm_year << endl;
 
 	if (nuevo->tm_year < 10 && nuevo->tm_year>0) {
 		return 1;
@@ -1259,11 +1259,11 @@ void fecha_de_hoy_y_nuevo_turno(Consultas consulta_nueva, tm* fecha_nuevo_turno)
 	strftime(date_string2, 50, "%d/%m/2023", curr_tm2);//ver
 	consulta_nueva.fecha_turno = date_string2;
 }
+
 void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lista_contactos, Medicos* lista_medicos, int* tam_pacientes, int* tam_consultas, int* tam_contactos, int* tam_medicos) {
 
 	int tam_lista_filtrada_consultas = 0;
 	Consultas* lista_cons;
-	Contactos* lista_filtrada_contactos;
 	Medicos* medico_nueva_consulta;
 	Medicos* medico_nueva_consulta_nuevo;
 	Consultas nueva_consulta;
@@ -1276,7 +1276,7 @@ void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lis
 
 	int tam_lista_archivados = 0;
 	Pacientes* lista_pac_archivados=NULL;
-	for (int i = 0; i < *tam_pacientes - 1; i++) {
+	for (int i = 0; i < *tam_pacientes - 1; i++) { //recorre lista pacientes-1
 		cout << "Paciente nro: " << i + 1 << endl;
 		cout << "Dni: " << lista_pac[i].dni << ", " << "Nombre: " << lista_pac[i].nombre << ", " << "Apellido: " << lista_pac[i].apellido << ", "
 			<< "Sexo: " << lista_pac[i].sexo << ", " << "Fecha de nacimiento: " << lista_pac[i].natalicio << ", " << "Estado paciente: " << lista_pac[i].estado
@@ -1359,7 +1359,7 @@ void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lis
 							curr_tm2->tm_mon = fecha_nuevo_turno->tm_mon;
 							curr_tm2->tm_mday = fecha_nuevo_turno->tm_mday;
 
-							strftime(date_string2, 50, "%d/%m/2023", curr_tm2);//ver
+							strftime(date_string2, 50, "%d/%m/2023", curr_tm2); //ver
 							nueva_consulta.fecha_turno = date_string2;
 							nueva_consulta.matricula_med = medico_nueva_consulta->matricula;
 							nueva_consulta.presento = false;
@@ -1370,11 +1370,9 @@ void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lis
 							cout << "Fecha del turno: " << nueva_consulta.fecha_turno << endl;
 							cout << "Matricula del medico del proximo turno: " << nueva_consulta.matricula_med << endl;
 							cout << "Se presento el paciente?: " << nueva_consulta.presento << endl;
-							//VER
 							string nueva_obra=Verificar_Datos_Paciente(lista_pac[i]);
 							cout << "Obra social nueva: " << nueva_obra << endl;
-							//agregar_consultas(nueva_lista_auxiliar_consultas, nueva_consulta, &tam_lista_consultas_auxiliar);
-							//guardamos la info en la lista de consultas
+						
 
 						}
 						//else
@@ -1388,7 +1386,7 @@ void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lis
 
 				}
 				else {
-					cout << "El paciente no ha respondido al llamado, procemos a llamar a su contacto de emergencia con el fin de dar con el paciente. " << endl;
+					cout << "El paciente no ha respondido al llamado, procedemos a llamar a su contacto de emergencia con el fin de dar con el paciente. " << endl;
 					contacto_paciente_a_llamar_emergencia = buscar_contacto_emergencia(lista_contactos, tam_contactos, lista_pac[i], contacto_paciente_a_llamar);
 
 					if (contacto_paciente_a_llamar_emergencia != NULL) {
@@ -1468,7 +1466,7 @@ void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lis
 									//aca habria que llamar a la funcion de archivar
 								}
 							}
-							else if (respuesta_estado_pac == 0) {
+							else if (respuesta_estado_pac == 1) {
 								lista_pac[i].estado = "fallecido";
 								cout << "El paciente ha fallecido, archivamos su historial." << endl;
 								agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
@@ -1490,6 +1488,7 @@ void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lis
 					}
 					else {
 						cout << "No se encontró un contacto de emergencia, procedemos a enviar un email al paciente e intentar llamar en unos dias otra vez. " << endl;
+						cout << "Enviando email al paciente,  su correo es:" << contacto_paciente_a_llamar->mail << endl;
 						//dejamos en standby
 
 					}
@@ -1544,15 +1543,15 @@ void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lis
 
 	crear_archivo_pacientes_archivados("Pacientes_Archivados.csv", lista_pac_archivados, &tam_lista_archivados);
 
-	Pacientes* lista5;
-	lista5 = read_archivo_pacientes_archivados("Pacientes_Archivados.csv");
+	Pacientes* lista_archivados;
+	lista_archivados = read_archivo_pacientes_archivados("Pacientes_Archivados.csv");
 
 	cout << "Leyendo pacientes archivados:" << endl;
 	for (int i = 0; i < tam_lista_archivados; i++) {
-		cout << lista5[i].dni << "," << lista5[i].nombre << "," << lista5[i].apellido << "," << lista5[i].sexo << "," << lista5[i].natalicio << "," << lista5[i].estado << "," << lista5[i].id_os << endl;
+		cout << lista_archivados[i].dni << "," << lista_archivados[i].nombre << "," << lista_archivados[i].apellido << "," << lista_archivados[i].sexo << "," << lista_archivados[i].natalicio << "," << lista_archivados[i].estado << "," << lista_archivados[i].id_os << endl;
 	}
 
-	Agregar_Archivado(lista_pac, lista5, tam_pacientes, &tam_lista_archivados);
+	Agregar_Archivado(lista_pac, lista_archivados, tam_pacientes, &tam_lista_archivados);
 
 	crear_archivo_lista_pacientes_nueva("Pacientes_Nueva_Lista.csv", lista_pac, tam_pacientes);
 
