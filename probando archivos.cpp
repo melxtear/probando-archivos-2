@@ -416,6 +416,7 @@ void crear_archivo_lista_pacientes_nueva(string nombre_a1, Pacientes*& lista_pac
 	return;
 }
 
+//ver si hace falta usar
 Pacientes* archivar_pacientes(Pacientes*& lista_pac_a_archivar, int* contador5, Pacientes pac_a_archivar, bool archivar_si) {
 	Pacientes* l_pac = new Pacientes[0];
 	int tamactual = 0;
@@ -1092,6 +1093,7 @@ tm* fecha_nuevo_turno_random() {
 	return ltm;
 }
 
+//ver si sirve
 string convertir_dia_a_string_dia(tm* ltm) {
 
 	string dia_semana;
@@ -1110,6 +1112,7 @@ string convertir_dia_a_string_dia(tm* ltm) {
 	return dia_semana;
 
 }
+
 //nueva, funciona
 void Agregar_Archivado(Pacientes* lista_pac_antigua, Pacientes* lista_archivados, int* tam_ant, int* tam_arch) {
 	
@@ -1235,6 +1238,7 @@ Contactos* buscar_contacto_pac(Contactos* lista_contactos, int* tam_contactos, P
 	}
 	return contacto_aux;
 }*/
+//ver si funca y si la necesitamos
 void fecha_de_hoy_y_nuevo_turno(Consultas consulta_nueva, tm* fecha_nuevo_turno) {
 	time_t curr_time;
 	tm* curr_tm;
