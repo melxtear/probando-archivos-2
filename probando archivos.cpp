@@ -431,7 +431,8 @@ void crear_archivo_lista_pacientes_nueva(string nombre_a1, Pacientes*& lista_pac
 	return;
 }
 
-Pacientes* leer_archivos(string a1, string a2, string a3) {
+//VER
+/*void leer_archivos(string a1, string a2, string a3) {
 	Pacientes* l_pac = new Pacientes[0];
 	Pacientes aux;
 	Contactos contacto_aux;
@@ -470,7 +471,6 @@ Pacientes* leer_archivos(string a1, string a2, string a3) {
 		fp2 >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy;
 		
 		//VEERRRR
-		/*
 		while (fp3) {
 			fp3 >> dniaux2 >> coma >> contacto_aux.telefono >> coma >> contacto_aux.celular >> coma;
 			getline(fp3, contacto_aux.direccion, ',');
@@ -491,14 +491,12 @@ Pacientes* leer_archivos(string a1, string a2, string a3) {
 		fp3 >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy;
 		
 		agregar_pacientes()
-		agregar(l_alumnos, aux, &tamact);*/
+		agregar(l_alumnos, aux, &tamact);
 	}
 
 	fp.close();
 	fp2.close();
-
-	return l_alumnos;
-}
+}*/
 
 //ver si hace falta usar
 Pacientes* archivar_pacientes(Pacientes*& lista_pac_a_archivar, int* contador5, Pacientes pac_a_archivar, bool archivar_si) {
@@ -1710,15 +1708,15 @@ void LLamado_Secretaria(Pacientes* lista_pac, int* tam_pacientes, Pacientes* lis
 
 	int tam_lista_filtrada_consultas = 0;
 	Consultas* lista_cons;
-	Medicos* medico_nueva_consulta;
-	Medicos* medico_nueva_consulta_nuevo;
+	Medicos* medico_nueva_consulta=	NULL;
+	Medicos* medico_nueva_consulta_nuevo=NULL;
 	Consultas nueva_consulta;
 	Contactos* contacto_paciente_a_llamar=NULL;
 	Contactos* contacto_paciente_a_llamar_emergencia=NULL;
 	tm* fecha_nuevo_turno;
 
 	Consultas* nueva_lista_auxiliar_consultas=NULL;
-	int tam_lista_consultas_auxiliar;
+	int tam_lista_consultas_auxiliar=0;
 
 	
 	
@@ -1731,6 +1729,7 @@ void LLamado_Secretaria(Pacientes* lista_pac, int* tam_pacientes, Pacientes* lis
 		//cout << "Es: " << aux2 << endl;
 
 		lista_cons = filtrar_lista_por_dni(lista_consultas, lista_nueva_verificados[i], tam_consultas, &tam_lista_filtrada_consultas);
+		cout << "Imprimiendo consultas del paciente: " << endl;
 		for (int j = 0; j < tam_lista_filtrada_consultas; j++) {
 			cout << "Dni: " << lista_cons[j].dni_pac << endl;
 			cout << "Fecha solicitado del turno: " << lista_cons[j].fecha_solicitado << endl;
@@ -2224,10 +2223,10 @@ int main()
 		//cout << "Es: " << aux2 << endl;
 
 	
-	Consultas* lista_cons;
-	Contactos* lista_filtrada_contactos;
-	Medicos* medico_nueva_consulta;
-	Medicos* medico_nueva_consulta_nuevo;
+	//Consultas* lista_cons;
+	//Contactos* lista_filtrada_contactos;
+	//Medicos* medico_nueva_consulta;
+	//Medicos* medico_nueva_consulta_nuevo;
 	/*
 	for (int i = 0; i < contador2 - 1; i++) {
 		cout << "Consulta nro: " << i + 1 << endl;
