@@ -85,7 +85,8 @@ typedef struct Pacientes {
 
 }Pacientes;
 
-/*void resize(Consultas*& lista_cons, int* tamactual, int cantidad_aumentar) {
+/*
+void resize(Consultas*& lista_cons, int* tamactual, int cantidad_aumentar) {
 	*tamactual = *tamactual + cantidad_aumentar;
 	int i = 0;
 	Consultas* aux = new Consultas[*tamactual];
@@ -162,6 +163,21 @@ void agregar_contactos(Contactos*& lista_cont, Contactos contacto, int* tamactua
 	lista_cont = aux;
 
 	return;
+}
+
+void agregar_consultas_extra(Consultas consulta, string a1, int* contador) {
+	fstream archi;
+
+	archi.open(a1, ios::app); //
+
+	if (archi.is_open()) {
+		//dni_pac , fecha_solicitado , fecha_turno , presento , matricula_med
+		archi << consulta.dni_pac << " , " << consulta.fecha_solicitado << " , " << consulta.fecha_turno << " , " << consulta.presento << " , " << consulta.matricula_med << endl;
+		*contador = *contador + 1;
+	}
+	else
+		cout << "Archivo no encontrado. " << endl;
+	archi.close();
 }
 
 
@@ -455,7 +471,7 @@ Pacientes* read_archivo_pacientes_archivados(string a1) {
 
 
 	}
-
+	
 
 	return l_pac;
 }
@@ -488,6 +504,92 @@ Pacientes* read_archivo_lista_pacientes_nueva(string a1) {
 	return l_pac;
 }
 
+void crear_archivo_auxiliar_pacientes(string nombre_a1, Pacientes*& lista_pac, int* tamactual) {
+	fstream archi;
+
+	archi.open(nombre_a1, ios::out);
+	//archi2.open(nombre_a2, ios::out);
+	int i = 0;
+
+	//&& archi2.is_open()
+	if (archi.is_open()) {
+		archi << "dni , nombre , apellido , sexo , natalicio , estado , obra_social, archivado" << endl;
+		while (i < *tamactual) {
+			//dni , nombre , apellido , sexo , natalicio , estado , obra_social
+
+			archi << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << lista_pac[i].archivado << "\n";
+			//archi << 10932 << " , " << 6 << " , " << 8 << endl;
+			//archi2 << "dni , apellido , nombre" << endl;
+			//archi2 << 10932 << " , Maradona , Diego" << endl;
+			//archi2 << 1000 << " , Messi , Lionel" << endl;
+			i++;
+		}
+
+	}
+
+	archi.close();
+	//archi2.close();
+
+	return;
+}
+
+/*void Modificar_Pacientes_Obra_Social(string a1, Pacientes pac_a_modificar, string nueva_obra_social) {
+
+	Pacientes* l_pac = new Pacientes[0];
+
+	fstream archi_aux;
+	fstream fr;
+
+	Pacientes aux_pac;
+	bool encontrado = false;
+	int auxDni = 0;
+	string aux_obra_social_nueva;
+	string aux_estado_nuevo;
+
+	string dummy;
+	char coma;
+	int tamact = 0;
+
+	//crear_archivo_auxiliar_pacientes(lista_pac, tamactual);
+	archi_aux.open("auxiliar.csv", ios::out);
+	fr.open("Pacientes.csv", ios::in);
+
+	fr >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy >> coma >> dummy;
+	if (archi_aux.is_open() && fr.is_open()) {
+		while (fr) {
+			archi_aux << "dni , nombre , apellido , sexo , natalicio , estado , obra_social , archivado" << endl;
+			fr >> aux_pac.dni >> coma >> aux_pac.apellido >> coma >> aux_pac.nombre >> coma >> aux_pac.sexo >> coma >> aux_pac.natalicio >> coma >> aux_pac.estado >> coma >> aux_pac.id_os >> coma >> aux_pac.archivado;
+			if (aux_pac.dni == pac_a_modificar.dni) {
+				encontrado = true;
+				aux_obra_social_nueva = nueva_obra_social;
+				archi_aux << aux_pac.dni << " , " << aux_pac.apellido << " , " << aux_pac.nombre << " , " << aux_pac.sexo << " , " << aux_pac.natalicio << " , " << aux_pac.estado << " , " << aux_obra_social_nueva << " , " << aux_pac.archivado;
+			}
+			else {
+				archi_aux << aux_pac.dni << " , " << aux_pac.apellido << " , " << aux_pac.nombre << " , " << aux_pac.sexo << " , " << aux_pac.natalicio << " , " << aux_pac.estado << " , " << aux_pac.id_os << " , " << aux_pac.archivado;
+			}
+		}
+		
+	}
+	else {
+		cout << "Error al leer archivo";
+	}
+	if (encontrado == false) {
+		cout << "No se encontro registro a modificar. " << endl;
+	}
+	archi_aux.close();
+	fr.close();
+	//archi2.close();
+	remove("Pacientes.csv");
+	rename("auxiliar.csv", "Paciente.csv");
+
+	return;
+
+	
+}
+/*
+void Modificar_Pacientes_Estado() {
+
+}*/
 //fue la primer idea para pasar de string a int, retornaba la fecha como int (ver si puede llegar a servir)
 int string_a_int(string fecha) {
 	int i = 0;
@@ -522,13 +624,50 @@ int string_a_int(string fecha) {
 	}
 	
 	return n;
-	//int aux = 0;
-	//for (int i = 0; i < 3; i++) {
-		//aux = stoi(paciente.natalicio);
-	//}
-	//return aux;
+
 } 
 
+
+
+//convierte un string de fecha en una fecha ctime
+tm* toInt(string cadena) {
+	time_t t = time(0);   // get time now
+	//tm* ltm = localtime(&t);;
+	tm* ltm = (tm*)malloc(sizeof(tm));
+
+	int i = 0;
+	int j = 0;
+	//int dia,mes,anio;
+	string dia, mes, anio = "";
+	while (i < cadena.length()) {
+		char aux = cadena[i];
+		if (aux != '/') {
+			if (j == 0)
+				dia = dia + aux;
+			if (j == 1)
+				mes = mes + aux;
+			if (j == 2)
+				anio = anio + aux;
+		}
+		else {
+			j++;
+		}
+		i++;
+
+
+	}
+	ltm->tm_year = stoi(anio);
+	ltm->tm_mday = stoi(dia);
+	ltm->tm_mon = stoi(mes);
+	//cout << "dia : " << ltm->tm_mday << endl;
+	//cout << "mes : " << ltm->tm_mon << endl;
+	//cout << "anio : " << ltm->tm_year << endl;
+
+	return ltm;
+
+}
+
+/*
 /*void toInt(string cadena) {
 
 	time_t curr_time;
@@ -569,45 +708,8 @@ int string_a_int(string fecha) {
 
 }*/
 
-//convierte un string de fecha en una fecha ctime
-tm* toInt(string cadena) {
-	time_t t = time(0);   // get time now
-	//tm* ltm = localtime(&t);;
-	tm* ltm = (tm*)malloc(sizeof(tm));
 
-	int i = 0;
-	int j = 0;
-	//int dia,mes,anio;
-	string dia, mes, anio = "";
-	while (i < cadena.length()) {
-		char aux = cadena[i];
-		if (aux != '/') {
-			if (j == 0)
-				dia = dia + aux;
-			if (j == 1)
-				mes = mes + aux;
-			if (j == 2)
-				anio = anio + aux;
-		}
-		else {
-			j++;
-		}
-		i++;
-
-
-	}
-	ltm->tm_year = stoi(anio);
-	ltm->tm_mday = stoi(dia);
-	ltm->tm_mon = stoi(mes);
-	//cout << "dia : " << ltm->tm_mday << endl;
-	//cout << "mes : " << ltm->tm_mon << endl;
-	//cout << "anio : " << ltm->tm_year << endl;
-
-	return ltm;
-
-}
-
-/*Contactos* filtrar_lista_por_dni_contactos(Contactos* lista_contactos, Pacientes pac, int* tamactual, int* tam) {
+Contactos* filtrar_lista_por_dni_contactos(Contactos* lista_contactos, Pacientes pac, int* tamactual, int* tam) {
 	Contactos* l_cont = new Contactos[0];
 	int tamact = 0;
 
@@ -619,7 +721,7 @@ tm* toInt(string cadena) {
 	}
 	return l_cont;
 
-}*/
+}
 
 Consultas* filtrar_lista_por_dni(Consultas* lista_consultas, Pacientes pac, int* tamactual, int* tam) {
 	Consultas* l_cons = new Consultas[0];
@@ -662,8 +764,8 @@ tm* Encontrar_Consulta_Fecha(Consultas* lista_consultas_filtradas, int* tamactua
 }
 
 //retorna struct de ultima consulta
-Consultas encontrar_ultima_consulta(Consultas* lista_consultas_filtradas, int* tamactual) {
-	Consultas aux;
+Consultas* encontrar_ultima_consulta(Consultas* lista_consultas_filtradas, int* tamactual) {
+	Consultas* aux=NULL;
 	tm* aux1;
 	tm* aux2;
 
@@ -671,22 +773,25 @@ Consultas encontrar_ultima_consulta(Consultas* lista_consultas_filtradas, int* t
 
 	for (int i = 0; i < *tamactual; i++) {
 
+		
 		aux2 = toInt(lista_consultas_filtradas[i].fecha_turno);
 		//aux1.año=1980 aux1.mes= 7 aux1.dia=20
 		//aux2.año=1982 aux2.mes=8  aux1.dia=24
 
 		if (aux1->tm_year < aux2->tm_year) {
 			aux1 = aux2;
-			aux = lista_consultas_filtradas[i];
+			aux = &lista_consultas_filtradas[i];
 		}
 		else if (aux1->tm_year < aux2->tm_year && aux1->tm_mon < aux2->tm_mon) {
 			aux1 = aux2;
-			aux = lista_consultas_filtradas[i];
+			aux = &lista_consultas_filtradas[i];
 		}
 		else if (aux1->tm_year < aux2->tm_year && aux1->tm_mon < aux2->tm_mon && aux1->tm_mday < aux2->tm_mday) {
 			aux1 = aux2;
-			aux = lista_consultas_filtradas[i];
+			aux = &lista_consultas_filtradas[i];
 		}
+		else
+			aux = &lista_consultas_filtradas[0];
 	}
 
 	return aux;
@@ -695,11 +800,11 @@ Consultas encontrar_ultima_consulta(Consultas* lista_consultas_filtradas, int* t
 
 Medicos* Buscar_Medico_Viejo(Medicos* Lista_Medicos, Consultas* lista_consultas, int* contador6, int*tam) {
 
-	Consultas ultima_consulta = encontrar_ultima_consulta(lista_consultas, contador6);
+	Consultas* ultima_consulta = encontrar_ultima_consulta(lista_consultas, contador6);
 	Medicos* aux=NULL;
 
 	for (int i = 0; i < *tam; i++) {
-		if (ultima_consulta.matricula_med == Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
+		if (ultima_consulta->matricula_med == Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
 			//si encuentra al medico que lo habia atendido antes y este se encuentra disponible, misma especialidad???
 			aux = &Lista_Medicos[i]; //encontramos al medico
 			return aux;
@@ -710,21 +815,21 @@ Medicos* Buscar_Medico_Viejo(Medicos* Lista_Medicos, Consultas* lista_consultas,
 
 Medicos* Buscar_Medico_Nuevo(Medicos* Lista_Medicos, Consultas* lista_consultas, int* contador6, int* tam) {
 
-	Consultas ultima_consulta = encontrar_ultima_consulta(lista_consultas, contador6);
+	Consultas* ultima_consulta = encontrar_ultima_consulta(lista_consultas, contador6);
 	Medicos* aux = NULL;
 
 	Medicos* medico_ultima_consulta = Buscar_Medico_Viejo(Lista_Medicos, lista_consultas, contador6, tam);
 	for (int i = 0; i < *tam; i++) {
 		int respuesta_agenda_llena = rand() % 2;
 		if (medico_ultima_consulta != NULL) {
-			if (ultima_consulta.matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true && medico_ultima_consulta->especialidad == Lista_Medicos[i].especialidad) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
+			if (ultima_consulta->matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true && medico_ultima_consulta->especialidad == Lista_Medicos[i].especialidad) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
 				//si encuentra al medico que lo habia atendido antes y este se encuentra disponible, misma especialidad???
 				aux = &Lista_Medicos[i]; //encontramos al medico
 				return aux;
 			}
 		}
 		else
-			if (ultima_consulta.matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true && respuesta_agenda_llena==0) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
+			if (ultima_consulta->matricula_med != Lista_Medicos[i].matricula && Lista_Medicos[i].activo == true && respuesta_agenda_llena==0) { //chequeamos solo si encuentra ==matricula, hay que ver del boolean agenda_llena
 				//si encuentra al medico que lo habia atendido antes y este se encuentra disponible, misma especialidad???
 				aux = &Lista_Medicos[i]; //encontramos al medico
 				return aux;
@@ -783,7 +888,7 @@ int Verificar_Anio_Ultima_Consulta(tm* fecha_ultima_consulta) {
 	tm* aux2 = toInt(s);
 
 	//cout << aux1 << endl;
-	cout << aux2->tm_mday << ", " << aux2->tm_mon << ", " << aux2->tm_year << endl;
+	//cout << aux2->tm_mday << ", " << aux2->tm_mon << ", " << aux2->tm_year << endl;
 
 	time_t t = time(0);
 	tm* nuevo= localtime(&t);
@@ -1045,6 +1150,15 @@ string Verificar_Datos_Paciente(Pacientes paciente_datos_verificar) {
 	return paciente_datos_verificar.id_os;
 }
 
+int verificar_estado_paciente(Pacientes paciente_a_verificar) {
+	if (paciente_a_verificar.estado == "fallecido")
+		return 0;
+	else if (paciente_a_verificar.estado == "internado")
+		return 1;
+	else if (paciente_a_verificar.estado == "n/c")
+		return 2;
+}
+
 tm* fecha_nuevo_turno_random() {
 	time_t t = time(0);   // get time now
 	//tm* ltm = localtime(&t);;
@@ -1239,7 +1353,7 @@ Contactos* buscar_contacto_pac(Contactos* lista_contactos, int* tam_contactos, P
 	return contacto_aux;
 }*/
 //ver si funca y si la necesitamos
-void fecha_de_hoy_y_nuevo_turno(Consultas consulta_nueva, tm* fecha_nuevo_turno) {
+/*void fecha_de_hoy_y_nuevo_turno(Consultas consulta_nueva, tm* fecha_nuevo_turno) {
 	time_t curr_time;
 	tm* curr_tm;
 	char date_string1[100];
@@ -1262,6 +1376,174 @@ void fecha_de_hoy_y_nuevo_turno(Consultas consulta_nueva, tm* fecha_nuevo_turno)
 
 	strftime(date_string2, 50, "%d/%m/2023", curr_tm2);//ver
 	consulta_nueva.fecha_turno = date_string2;
+}
+*/
+
+bool cambio_obra_social() {
+	int respuesta1 = rand() % 2;
+
+	cout << "El paciente ha cambiado sus datos de obra social? " << endl;
+	if (respuesta1 == 1) {
+		cout << "El paciente ha cambiado de obra social, preguntamos por cual y modificamos sus datos en el archivo. " << endl;
+		return true;
+	}
+	else {
+		cout << "El paciente no se cambio de obra social." << endl;
+		return false;
+	}
+
+
+}
+
+string fecha_de_hoy() {
+	time_t curr_time;
+	tm* curr_tm;
+	char date_string1[100];
+
+
+	time(&curr_time);
+	curr_tm = localtime(&curr_time);
+
+	strftime(date_string1, 50, "%d/%m/%Y", curr_tm);
+	return date_string1;
+}
+
+string fecha_turno(tm* fecha_turno) {
+	time_t curr_time2;
+	tm* curr_tm2;
+	time(&curr_time2);
+	curr_tm2 = localtime(&curr_time2);
+
+	char date_string2[100];
+
+	curr_tm2->tm_year = 2023;
+	curr_tm2->tm_mon = fecha_turno->tm_mon;
+	curr_tm2->tm_mday = fecha_turno->tm_mday;
+
+	strftime(date_string2, 50, "%d/%m/2023", curr_tm2); //ver
+	return date_string2;
+}
+/*
+bool verificar_pac_retorno(Pacientes lista_pac) {
+	//time_t curr_time;
+	//curr_time = time(NULL);
+
+	//char* tm = ctime(&curr_time);
+	//cout << "Today is : " << tm;
+
+	//auto now = chrono::system_clock::now();
+	//auto time = chrono::system_clock::to_time_t(now);
+
+	//cout << put_time(localtime(&time), "%Y");
+
+	/*time_t p = time(0);   // get time now
+	tm* now = localtime(&p);
+	cout << now->tm_mday << ", " << now->tm_mon << ", " << now->tm_year << endl;
+
+	char s[100];
+	int rc;
+	time_t temp;
+	struct tm* timeptr;
+
+	temp = time(NULL);
+	timeptr = localtime(&temp);
+
+	//"Today is %A, %b %d %Y.\nTime:  %r"
+	rc = strftime(s, sizeof(s), "%d/%m/%Y", timeptr);
+	//printf("%d characters written.\n%s\n", rc, s);
+	//cout << "Separacion: " << endl;
+	//cout << s << endl;
+	//tm* now2 = localtime(&t);
+	//int aux1 = string_a_int(s);
+	tm* aux2 = toInt(s);
+
+	//cout << aux1 << endl;
+	//cout << aux2->tm_mday << ", " << aux2->tm_mon << ", " << aux2->tm_year << endl;
+
+	time_t t = time(0);
+	tm* nuevo = localtime(&t);
+	nuevo->tm_year = (aux2->tm_year) - (fecha_ultima_consulta->tm_year);
+
+	cout << "Diferencia de años: " << nuevo->tm_year << endl;
+
+	if (nuevo->tm_year < 10 && nuevo->tm_year>0) {
+		return 1;
+		//ok, la diferencia de año es menor a 10 o sea es un paciente recuperable, podemos llamar
+	}
+	else if (nuevo->tm_year == 10) { //la diferencia de año es 10, está al limite
+		if (fecha_ultima_consulta->tm_mon > aux2->tm_mon) { //vemos si el mes de la ultima consulta es mayor
+			return 1;
+			//ok, el mes de la consulta es mayor, ej 11/2022-12/2012, significa que todavia no llegaron a ser 10 años 
+			//justos de su ultima consulta, por eso es un paciente recuperable, podemos llamarlo
+		}
+		else if (fecha_ultima_consulta->tm_mon == aux2->tm_mon) { //el mes es igua, está al limit
+			if (fecha_ultima_consulta->tm_mday >= aux2->tm_mday) {
+				return 1;
+				//todavia no se cumplieron los 10 años o se cumplieron los 10 años justo ese dia
+				//pero es un paciente recuperable, podemos llamarlo
+			}
+			else//el dia de la ultima consulta es mas chico, se supero el limite
+				return 0;
+			//ya se cumplieron los 10 años, es un paciente irrecuperable, procedemos a archivarlo
+
+		}
+		else if (fecha_ultima_consulta->tm_mon < aux2->tm_mon) {////el mes de ultima consulta es mas chico, supero limite
+			//ya se cumplieron los 10 años, es un paciente irrecuperable, procedemos a archivarlo
+			return 0;
+		}
+	}
+	else if (nuevo->tm_year > 10)//la diferencia de años es mayor a los 10, se supero el limite
+		return 0;//ya se cumplieron los 10 años, es un paciente irrecuperable, procedemos a archivarlo
+	else if (nuevo->tm_year < 0)
+		return 2;
+	else if (nuevo->tm_year == 0) {
+		if (fecha_ultima_consulta->tm_mon > aux2->tm_mon)
+			return 2;
+		else if (fecha_ultima_consulta->tm_mon == aux2->tm_mon) {
+			if (fecha_ultima_consulta->tm_mday >= aux2->tm_mday) {
+				return 2;
+				//todavia no se cumplieron los 10 años o se cumplieron los 10 años justo ese dia
+				//pero es un paciente recuperable, podemos llamarlo
+			}
+			else//el dia de la ultima consulta es mas chico, se supero el limite
+				return 1;
+		}
+		else if (fecha_ultima_consulta->tm_mon < aux2->tm_mon)
+			return 1;
+	}
+
+
+	//cout << "dia : " << ltm->tm_mday << endl;
+	//cout << "mes : " << ltm->tm_mon << endl;
+	//cout << "anio 
+}
+*/
+void Imprimir_Datos_Consulta(Consultas nueva_consulta, Pacientes lista_pac) {
+	if (cambio_obra_social() == true) {
+		string nueva_obra = Verificar_Datos_Paciente(lista_pac);
+		cout << "Datos de la nueva consulta: " << endl;
+		cout << "DNI del paciente: " << nueva_consulta.dni_pac << endl;
+		cout << "Fecha en la cual se solicito el turno: " << nueva_consulta.fecha_solicitado << endl;
+		cout << "Fecha del turno: " << nueva_consulta.fecha_turno << endl;
+		cout << "Matricula del medico del proximo turno: " << nueva_consulta.matricula_med << endl;
+		cout << "Se presento el paciente?: " << nueva_consulta.presento << endl;
+		cout << "Obra social nueva: " << nueva_obra << endl;
+
+		//Modificar_Pacientes_Obra_Social("Pacientes.csv", lista_pac, nueva_obra);
+		//agregar_consultas_extra(nueva_consulta, "Consultas.csv", tam_consultas);
+		//agregar_consultas(nueva_lista_auxiliar_consultas, nueva_consulta, &tam_lista_consultas_auxiliar);
+	}
+	else {
+		cout << "Datos de la nueva consulta: " << endl;
+		cout << "DNI del paciente: " << nueva_consulta.dni_pac << endl;
+		cout << "Fecha en la cual se solicito el turno: " << nueva_consulta.fecha_solicitado << endl;
+		cout << "Fecha del turno: " << nueva_consulta.fecha_turno << endl;
+		cout << "Matricula del medico del proximo turno: " << nueva_consulta.matricula_med << endl;
+		cout << "Se presento el paciente?: " << nueva_consulta.presento << endl;
+		cout << "Obra social:" << lista_pac.id_os << endl;
+		//agregar_consultas_extra(nueva_consulta, "Consultas.csv", tam_consultas);
+		//agregar_consultas(nueva_lista_auxiliar_consultas, nueva_consulta, &tam_lista_consultas_auxiliar);
+	}
 }
 
 void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lista_contactos, Medicos* lista_medicos, int* tam_pacientes, int* tam_consultas, int* tam_contactos, int* tam_medicos) {
@@ -1302,230 +1584,293 @@ void Secretaria(Pacientes* lista_pac, Consultas* lista_consultas, Contactos* lis
 					
 				
 			
-			tm* aux8;
-			aux8 = toInt(lista_cons[j].fecha_solicitado);
+			//tm* aux8;
+			//aux8 = toInt(lista_cons[j].fecha_solicitado);
 			//cout << "Dia: " << aux8->tm_mday << " Mes: " << aux8->tm_mon << " Anio: " << aux8->tm_year << endl;
 		}
-		tm* aux3 = Encontrar_Consulta_Fecha(lista_cons, &tam_lista_filtrada_consultas);
-		cout << "La consulta mas actual es: " << aux3->tm_mday << ", " << aux3->tm_mon << ", " << aux3->tm_year << endl;
-		Consultas aux_ult_consulta = encontrar_ultima_consulta(lista_cons, &tam_lista_filtrada_consultas);
 
-		int verificacion = Verificar_Anio_Ultima_Consulta(aux3);
-		//ultima_consulta = encontrar_ultima_consulta(lista_cons, &tam_lista_filtrada);
+		int verificacion_estado_paciente = verificar_estado_paciente(lista_pac[i]);
+		
+		if (verificacion_estado_paciente == 2) {//paciente vivo segun historial
+			tm* aux3 = Encontrar_Consulta_Fecha(lista_cons, &tam_lista_filtrada_consultas);
+			//cout << "La consulta mas actual es: " << aux3->tm_mday << ", " << aux3->tm_mon << ", " << aux3->tm_year << endl;
+			Consultas* aux_ult_consulta = encontrar_ultima_consulta(lista_cons, &tam_lista_filtrada_consultas);
 
-		if (verificacion==1 && aux_ult_consulta.presento==false) { //paciente relativamente nuevo
-			cout << "Paciente recuperable, procedemos a buscar algun contacto telefonico y llamar. " << endl;
+			int verificacion_anio_ultima_consulta = Verificar_Anio_Ultima_Consulta(aux3);
+			//ultima_consulta = encontrar_ultima_consulta(lista_cons, &tam_lista_filtrada);
 
-			contacto_paciente_a_llamar = buscar_contacto_pac(lista_contactos, tam_contactos, lista_pac[i]);
+			if (verificacion_anio_ultima_consulta == 1) { //paciente relativamente nuevo
 
-			if (contacto_paciente_a_llamar != NULL) {
-				cout << "Encontramos contacto del paciente, los datos son los siguientes: " << endl;
-
-				cout << "Dni del paciente: " << contacto_paciente_a_llamar->dni_pac << ", " << "Telefono: " << contacto_paciente_a_llamar->telefono << ", "
-					<< "Celular: " << contacto_paciente_a_llamar->celular << ", " << "Direccion: " << contacto_paciente_a_llamar->direccion
-					<< ", " << "E-Mail: " << contacto_paciente_a_llamar->mail << endl;
-
-				cout << "Llamando al paciente.." << endl;
-
-				int respuesta_llamado_paciente = rand() % 2;
-
-				if (respuesta_llamado_paciente) {
-					cout << "El paciente ha respondido al llamado. Procedemos a consultar sobre la posibilidad de tener un nuevo turno en nuestro centro medico" << endl;
-
-					int respuesta_pac_nuevo_turno = rand() % 2;
-
-					if (respuesta_pac_nuevo_turno) {
-						cout << "El paciente quiere un nuevo turno en nuestro centro medico." << endl;
-						medico_nueva_consulta = Asignar_Medico(lista_medicos, lista_cons, &tam_lista_filtrada_consultas, tam_medicos);
-
-						if (medico_nueva_consulta != NULL) {
-							cout << "Ya asignamos con exito al medico de su proxima consulta, procedemos a dar una fecha del turno. " << endl;
-							fecha_nuevo_turno = fecha_nuevo_turno_random();
-
-							nueva_consulta.dni_pac = lista_pac[i].dni;
-							time_t curr_time;
-							tm* curr_tm;
-							char date_string1[100];
-							char date_string2[100];
-
-							time(&curr_time);
-							curr_tm = localtime(&curr_time);
-
-							strftime(date_string1, 50, "%d/%m/%Y", curr_tm);
-							nueva_consulta.fecha_solicitado = date_string1;
-
-							time_t curr_time2;
-							tm* curr_tm2;
-							time(&curr_time2);
-							curr_tm2 = localtime(&curr_time2);
-
-							curr_tm2->tm_year = 2023;
-							curr_tm2->tm_mon = fecha_nuevo_turno->tm_mon;
-							curr_tm2->tm_mday = fecha_nuevo_turno->tm_mday;
-
-							strftime(date_string2, 50, "%d/%m/2023", curr_tm2); //ver
-							nueva_consulta.fecha_turno = date_string2;
-							nueva_consulta.matricula_med = medico_nueva_consulta->matricula;
-							nueva_consulta.presento = false;
-
-							cout << "Datos de la nueva consulta: " << endl;
-							cout << "DNI del paciente: " << nueva_consulta.dni_pac << endl;
-							cout << "Fecha en la cual se solicito el turno: " << nueva_consulta.fecha_solicitado << endl;
-							cout << "Fecha del turno: " << nueva_consulta.fecha_turno << endl;
-							cout << "Matricula del medico del proximo turno: " << nueva_consulta.matricula_med << endl;
-							cout << "Se presento el paciente?: " << nueva_consulta.presento << endl;
-							string nueva_obra=Verificar_Datos_Paciente(lista_pac[i]);
-							cout << "Obra social nueva: " << nueva_obra << endl;
-						
-
-						}
-						//else
-							//cout << "Hubo problemas para asignar un medico con disponibilidad, volveremos a llamar al paciente en unos dias. " << endl;
+				if (aux_ult_consulta->presento == false) {
+					cout << "Datos ultima consulta del paciente: " << endl;
+					cout << "Dni: " << aux_ult_consulta->dni_pac << endl;
+					cout << "Fecha solicitado del turno: " << aux_ult_consulta->fecha_solicitado << endl;
+					cout << "Fecha del turno: " << aux_ult_consulta->fecha_turno << endl;
+					cout << "Matricula del medico: " << aux_ult_consulta->matricula_med << endl;
+					if (aux_ult_consulta->presento == true) {
+						cout << "Presento:" << "Se presento al ultimo turno." << endl;
 					}
-					else {
-						cout << "El paciente no está interesado en obtener un nuevo turno en nuestro centro medico, archivamos su historial. " << endl;
-						agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
-						//aca habria que llamar a la funcion de archivar
-					}
+					else
+						cout << "Presento:" << "No se presento al ultimo turno." << endl;
 
-				}
-				else {
-					cout << "El paciente no ha respondido al llamado, procedemos a llamar a su contacto de emergencia con el fin de dar con el paciente. " << endl;
-					contacto_paciente_a_llamar_emergencia = buscar_contacto_emergencia(lista_contactos, tam_contactos, lista_pac[i], contacto_paciente_a_llamar);
+					cout << "Paciente recuperable, procedemos a buscar algun contacto telefonico y llamar. " << endl;
 
-					if (contacto_paciente_a_llamar_emergencia != NULL) {
-						cout << "Encontramos al contacto de emergencia, sus datos son: " << endl;
+					contacto_paciente_a_llamar = buscar_contacto_pac(lista_contactos, tam_contactos, lista_pac[i]);
 
-						cout << "Dni del paciente: " << contacto_paciente_a_llamar_emergencia->dni_pac << ", " << "Telefono del contacto: " << contacto_paciente_a_llamar_emergencia->telefono << ", "
-							<< "Celular del contacto: " << contacto_paciente_a_llamar->celular << ", " << "Direccion del contacto: " << contacto_paciente_a_llamar->direccion
-							<< ", " << "E-Mail del contacto: " << contacto_paciente_a_llamar->mail << endl;
+					if (contacto_paciente_a_llamar != NULL) {
+						cout << "Encontramos contacto del paciente, los datos son los siguientes: " << endl;
 
-						cout << "Llamando al contacto de emergencia.. " << endl;
+						cout << "Dni del paciente: " << contacto_paciente_a_llamar->dni_pac << ", " << "Telefono: " << contacto_paciente_a_llamar->telefono << ", "
+							<< "Celular: " << contacto_paciente_a_llamar->celular << ", " << "Direccion: " << contacto_paciente_a_llamar->direccion
+							<< ", " << "E-Mail: " << contacto_paciente_a_llamar->mail << endl;
 
-						int respuesta_contacto_emergencia = rand() % 2;
-						if (respuesta_contacto_emergencia) {
-							cout << "El contacto ha respondido al llamado, procedemos a consultar sobre como se encuentra el paciente y porque no atendio, con el fin de asignar un nuevo turno" << endl;
+						cout << "Llamando al paciente.." << endl;
 
-							int respuesta_estado_pac = rand() % 3;//0 esta vivo, no atendio porque estaba ocupado, procedemos a llamarlo y ya directo asignar turnp
-							//1 fallecio, procedemos a archivar y modificar su estado a fallecido
-							//2 internado, procedemos a dejar en standby y llamar cuando se encuentre mejor, modificamos estado
+						int respuesta_llamado_paciente = rand() % 2;
 
-							if (respuesta_estado_pac == 0) {
-								cout << "El paciente se encuentra bien, procedemos a llamarlo y ver la posibilidad de que agende un nuevo turno. " << endl;
-								int respuesta_pac_nuevo_turno2 = rand() % 2;
+						if (respuesta_llamado_paciente) {
+							cout << "El paciente ha respondido al llamado. Procedemos a consultar sobre la posibilidad de tener un nuevo turno en nuestro centro medico" << endl;
 
-								if (respuesta_pac_nuevo_turno2) {
-									cout << "El paciente quiere un nuevo turno en nuestro centro medico." << endl;
-									medico_nueva_consulta = Asignar_Medico(lista_medicos, lista_cons, &tam_lista_filtrada_consultas, tam_medicos);
+							int respuesta_pac_nuevo_turno = rand() % 2;
 
-									if (medico_nueva_consulta != NULL) {
-										cout << "Ya asignamos con exito al medico de su proxima consulta, procedemos a dar una fecha del turno. " << endl;
-										fecha_nuevo_turno = fecha_nuevo_turno_random();
+							if (respuesta_pac_nuevo_turno) {
+								cout << "El paciente quiere un nuevo turno en nuestro centro medico." << endl;
+								medico_nueva_consulta = Asignar_Medico(lista_medicos, lista_cons, &tam_lista_filtrada_consultas, tam_medicos);
 
-										nueva_consulta.dni_pac = lista_pac[i].dni;
-										time_t curr_time;
-										tm* curr_tm;
-										char date_string1[100];
-										char date_string2[100];
+								if (medico_nueva_consulta != NULL) {
+									cout << "Ya asignamos con exito al medico de su proxima consulta, procedemos a dar una fecha del turno. " << endl;
+									fecha_nuevo_turno = fecha_nuevo_turno_random();
 
-										time(&curr_time);
-										curr_tm = localtime(&curr_time);
 
-										strftime(date_string1, 50, "%d/%m/%Y", curr_tm);
-										nueva_consulta.fecha_solicitado = date_string1;
+									/*time_t curr_time;
+									tm* curr_tm;
+									char date_string1[100];
+									char date_string2[100];
 
-										time_t curr_time2;
-										tm* curr_tm2;
-										time(&curr_time2);
-										curr_tm2 = localtime(&curr_time2);
+									time(&curr_time);
+									curr_tm = localtime(&curr_time);
 
-										curr_tm2->tm_year = 2023;
-										curr_tm2->tm_mon = fecha_nuevo_turno->tm_mon;
-										curr_tm2->tm_mday = fecha_nuevo_turno->tm_mday;
+									strftime(date_string1, 50, "%d/%m/%Y", curr_tm);*/
+									string date_string1 = fecha_de_hoy();
+									string date_string2 = fecha_turno(fecha_nuevo_turno);
+									/*
+									time_t curr_time2;
+									tm* curr_tm2;
+									time(&curr_time2);
+									curr_tm2 = localtime(&curr_time2);
 
-										strftime(date_string2, 50, "%d/%m/2023", curr_tm2);//ver
-										nueva_consulta.fecha_turno = date_string2;
 
-										nueva_consulta.matricula_med = medico_nueva_consulta->matricula;
-										nueva_consulta.presento = false;
+									curr_tm2->tm_year = 2023;
+									curr_tm2->tm_mon = fecha_nuevo_turno->tm_mon;
+									curr_tm2->tm_mday = fecha_nuevo_turno->tm_mday;
 
-										cout << "Datos de la nueva consulta: " << endl;
-										cout << "DNI del paciente: " << nueva_consulta.dni_pac << endl;
-										cout << "Fecha en la cual se solicito el turno: " << nueva_consulta.fecha_solicitado << endl;
-										cout << "Fecha del turno: " << nueva_consulta.fecha_turno << endl;
-										cout << "Matricula del medico del proximo turno: " << nueva_consulta.matricula_med << endl;
-										cout << "Se presento el paciente?: " << nueva_consulta.presento << endl;
-										//guardamos la info en la lista de consultas
-										//VER
-										Verificar_Datos_Paciente(lista_pac[i]);
-										//agregar_consultas(nueva_lista_auxiliar_consultas, nueva_consulta, &tam_lista_consultas_auxiliar);
-										cout << "Obra social nueva: " << lista_pac[i].id_os << endl;
-									}
-									//else
-									//	cout << "Hubo problemas para asignar un medico con disponibilidad, volveremos a llamar al paciente en unos dias. " << endl;
+									strftime(date_string2, 50, "%d/%m/2023", curr_tm2); //ver*/
+									nueva_consulta.fecha_solicitado = date_string1;
+									nueva_consulta.fecha_turno = date_string2;
+									nueva_consulta.matricula_med = medico_nueva_consulta->matricula;
+									nueva_consulta.dni_pac = lista_pac[i].dni;
+									nueva_consulta.presento = false;
+
+									Imprimir_Datos_Consulta(nueva_consulta, lista_pac[i]);
+
+									agregar_consultas_extra(nueva_consulta, "Consultas.csv", tam_consultas);
+			
+									/*cout << "Datos de la nueva consulta: " << endl;
+									cout << "DNI del paciente: " << nueva_consulta.dni_pac << endl;
+									cout << "Fecha en la cual se solicito el turno: " << nueva_consulta.fecha_solicitado << endl;
+									cout << "Fecha del turno: " << nueva_consulta.fecha_turno << endl;
+									cout << "Matricula del medico del proximo turno: " << nueva_consulta.matricula_med << endl;
+									cout << "Se presento el paciente?: " << nueva_consulta.presento << endl;
+									string nueva_obra=Verificar_Datos_Paciente(lista_pac[i]);
+									cout << "Obra social nueva: " << nueva_obra << endl;*/
+
+
 								}
-								else {
-									cout << "El paciente no está interesado en obtener un nuevo turno en nuestro centro medico, archivamos su historial. " << endl;
-									agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
-									//aca habria que llamar a la funcion de archivar
-								}
-							}
-							else if (respuesta_estado_pac == 1) {
-								lista_pac[i].estado = "fallecido";
-								cout << "El paciente ha fallecido, archivamos su historial." << endl;
-								agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
-								//funcion de archivar
-
+								//else
+									//cout << "Hubo problemas para asignar un medico con disponibilidad, volveremos a llamar al paciente en unos dias. " << endl;
 							}
 							else {
-								cout << "El contacto nos informa que el paciente se encuentra internado, modificamos el archivo y procedemos a llamar mas adelante" << endl;
-								lista_pac[i].estado = "internado";
+								cout << "El paciente no está interesado en obtener un nuevo turno en nuestro centro medico, archivamos su historial. " << endl;
+								agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
+								//aca habria que llamar a la funcion de archivar
 							}
 
 						}
 						else {
-							cout << "El contacto de emergencia no ha respondido al llamado. Enviamos un email a ambos contactos con el fin de recibir respuesta, de igual forma en unos dias llamamos al paciente otra vez. " << endl;
-							//dejamos en standby
-							cout << "Enviando email al paciente,  su correo es:" << contacto_paciente_a_llamar->mail << endl;
-							cout << "Enviando email al contacto de emergencia, su correo es: " << contacto_paciente_a_llamar_emergencia->mail << endl;
+							cout << "El paciente no ha respondido al llamado, procedemos a llamar a su contacto de emergencia con el fin de dar con el paciente. " << endl;
+							contacto_paciente_a_llamar_emergencia = buscar_contacto_emergencia(lista_contactos, tam_contactos, lista_pac[i], contacto_paciente_a_llamar);
+
+							if (contacto_paciente_a_llamar_emergencia != NULL) {
+								cout << "Encontramos al contacto de emergencia, sus datos son: " << endl;
+
+								cout << "Dni del paciente: " << contacto_paciente_a_llamar_emergencia->dni_pac << ", " << "Telefono del contacto: " << contacto_paciente_a_llamar_emergencia->telefono << ", "
+									<< "Celular del contacto: " << contacto_paciente_a_llamar->celular << ", " << "Direccion del contacto: " << contacto_paciente_a_llamar->direccion
+									<< ", " << "E-Mail del contacto: " << contacto_paciente_a_llamar->mail << endl;
+
+								cout << "Llamando al contacto de emergencia.. " << endl;
+
+								int respuesta_contacto_emergencia = rand() % 2;
+								if (respuesta_contacto_emergencia) {
+									cout << "El contacto ha respondido al llamado, procedemos a consultar sobre como se encuentra el paciente y porque no atendio, con el fin de asignar un nuevo turno" << endl;
+
+									int respuesta_estado_pac = rand() % 3;//0 esta vivo, no atendio porque estaba ocupado, procedemos a llamarlo y ya directo asignar turnp
+									//1 fallecio, procedemos a archivar y modificar su estado a fallecido
+									//2 internado, procedemos a dejar en standby y llamar cuando se encuentre mejor, modificamos estado
+
+									if (respuesta_estado_pac == 0) {
+										cout << "El paciente se encuentra bien, procedemos a llamarlo y ver la posibilidad de que agende un nuevo turno. " << endl;
+										int respuesta_pac_nuevo_turno2 = rand() % 2;
+
+										if (respuesta_pac_nuevo_turno2) {
+											cout << "El paciente quiere un nuevo turno en nuestro centro medico." << endl;
+											medico_nueva_consulta = Asignar_Medico(lista_medicos, lista_cons, &tam_lista_filtrada_consultas, tam_medicos);
+
+											if (medico_nueva_consulta != NULL) {
+												cout << "Ya asignamos con exito al medico de su proxima consulta, procedemos a dar una fecha del turno. " << endl;
+												fecha_nuevo_turno = fecha_nuevo_turno_random();
+
+
+												/*time_t curr_time;
+												tm* curr_tm;
+												char date_string1[100];
+												char date_string2[100];
+
+												time(&curr_time);
+												curr_tm = localtime(&curr_time);
+
+												strftime(date_string1, 50, "%d/%m/%Y", curr_tm);*/
+												string date_string1 = fecha_de_hoy();
+												string date_string2 = fecha_turno(fecha_nuevo_turno);
+												/*
+												time_t curr_time2;
+												tm* curr_tm2;
+												time(&curr_time2);
+												curr_tm2 = localtime(&curr_time2);
+
+
+												curr_tm2->tm_year = 2023;
+												curr_tm2->tm_mon = fecha_nuevo_turno->tm_mon;
+												curr_tm2->tm_mday = fecha_nuevo_turno->tm_mday;
+
+												strftime(date_string2, 50, "%d/%m/2023", curr_tm2); //ver*/
+												nueva_consulta.fecha_solicitado = date_string1;
+												nueva_consulta.fecha_turno = date_string2;
+												nueva_consulta.matricula_med = medico_nueva_consulta->matricula;
+												nueva_consulta.dni_pac = lista_pac[i].dni;
+												nueva_consulta.presento = false;
+
+												Imprimir_Datos_Consulta(nueva_consulta, lista_pac[i]);
+
+												agregar_consultas_extra(nueva_consulta, "Consultas.csv", tam_consultas);
+												/*cout << "Datos de la nueva consulta: " << endl;
+												cout << "DNI del paciente: " << nueva_consulta.dni_pac << endl;
+												cout << "Fecha en la cual se solicito el turno: " << nueva_consulta.fecha_solicitado << endl;
+												cout << "Fecha del turno: " << nueva_consulta.fecha_turno << endl;
+												cout << "Matricula del medico del proximo turno: " << nueva_consulta.matricula_med << endl;
+												cout << "Se presento el paciente?: " << nueva_consulta.presento << endl;
+												string nueva_obra=Verificar_Datos_Paciente(lista_pac[i]);
+												cout << "Obra social nueva: " << nueva_obra << endl;*/
+
+											}
+											//else
+											//	cout << "Hubo problemas para asignar un medico con disponibilidad, volveremos a llamar al paciente en unos dias. " << endl;
+										}
+										else {
+											cout << "El paciente no está interesado en obtener un nuevo turno en nuestro centro medico, archivamos su historial. " << endl;
+											agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
+											//aca habria que llamar a la funcion de archivar
+										}
+									}
+									else if (respuesta_estado_pac == 1) {
+										lista_pac[i].estado = "fallecido";
+										cout << "El paciente ha fallecido, archivamos su historial." << endl;
+										agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
+										//funcion de archivar
+
+									}
+									else {
+										cout << "El contacto nos informa que el paciente se encuentra internado, modificamos el archivo y procedemos a llamar mas adelante" << endl;
+										lista_pac[i].estado = "internado";
+									}
+
+								}
+								else {
+									cout << "El contacto de emergencia no ha respondido al llamado. Enviamos un email a ambos contactos con el fin de recibir respuesta, de igual forma en unos dias llamamos al paciente otra vez. " << endl;
+									//dejamos en standby
+									cout << "Enviando email al paciente,  su correo es:" << contacto_paciente_a_llamar->mail << endl;
+									cout << "Enviando email al contacto de emergencia, su correo es: " << contacto_paciente_a_llamar_emergencia->mail << endl;
+								}
+							}
+							else {
+								cout << "No se encontró un contacto de emergencia, procedemos a enviar un email al paciente e intentar llamar en unos dias otra vez. " << endl;
+								cout << "Enviando email al paciente,  su correo es:" << contacto_paciente_a_llamar->mail << endl;
+								//dejamos en standby
+
+							}
 						}
-					}
-					else {
-						cout << "No se encontró un contacto de emergencia, procedemos a enviar un email al paciente e intentar llamar en unos dias otra vez. " << endl;
-						cout << "Enviando email al paciente,  su correo es:" << contacto_paciente_a_llamar->mail << endl;
-						//dejamos en standby
 
 					}
+					else
+						cout << "Ha ocurrido un error y no se ha podido encontrar información de contacto del paciente. " << endl;
 				}
+				else {
+					cout << "El paciente se presento a su ultimo turno, el cual fue hace menos de 10 años." << endl;
 
+					
+					cout << "Datos ultima consulta del paciente: " << endl;
+					cout << "Dni: " << aux_ult_consulta->dni_pac << endl;
+					cout << "Fecha solicitado del turno: " << aux_ult_consulta->fecha_solicitado << endl;
+					cout << "Fecha del turno: " << aux_ult_consulta->fecha_turno << endl;
+					cout << "Matricula del medico: " << aux_ult_consulta->matricula_med << endl;
+					if (aux_ult_consulta->presento == true) {
+						cout << "Presento:" << "Se presento al ultimo turno." << endl;
+					}
+					else
+						cout << "Presento:" << "No se presento al ultimo turno." << endl;;
+				}
+				
 			}
-			else
-				cout << "Ha ocurrido un error y no se ha podido encontrar información de contacto del paciente. " << endl;
+			else if (verificacion_anio_ultima_consulta == 0) {
+				cout << "El paciente se atendio hace mas de 10 años, es un paciente irrecuperable. Archivamos su historial. " << endl;
+				agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
+				//archivamos
+			}
+			else if (verificacion_anio_ultima_consulta == 2) {
+				cout << "El paciente ya tiene un turno proximo. Datos del turno: " << endl;
+
+				cout << "Datos ultima consulta del paciente: " << endl;
+				cout << "Dni: " << aux_ult_consulta->dni_pac << endl;
+				cout << "Fecha solicitado del turno: " << aux_ult_consulta->fecha_solicitado << endl;
+				cout << "Fecha del turno: " << aux_ult_consulta->fecha_turno << endl;
+				cout << "Matricula del medico: " << aux_ult_consulta->matricula_med << endl;
+				if (aux_ult_consulta->presento == true) {
+					cout << "Presento:" << "Se presento al ultimo turno." << endl;
+				}
+				else
+					cout << "Presento:" << "No se presento al ultimo turno." << endl;
+
+				cout << "Es un paciente activo. No hace falta llamar ni archivar. " << endl;
+			}
+			
+
 		}
-		else if(verificacion==0) {
-			cout << "El paciente se atendio hace mas de 10 años, es un paciente irrecuperable. Archivamos su historial. " << endl;
-			agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
-			//archivamos
-		}
-		else if(verificacion==2)
-			cout << "El paciente ya tiene un turno proximo. No hace falta llamar." << endl;
-		else if (lista_pac[i].estado == "fallecido") {
+		else if (verificacion_estado_paciente == 1) {//paciente internado segun historial
 			cout << "El paciente se encuentra fallecido, archivamos su historial. " << endl;
 			agregar_pacientes_archivados(lista_pac_archivados, lista_pac[i], &tam_lista_archivados);
 			//archivamos
 		}
-		else if (lista_pac[i].estado == "internado") {
+		else if (verificacion_estado_paciente == 0) {//paciente fallecido segun historial
 			cout << "El paciente se encuentra internado en nuestro centro medico, llamamos mas adelante. " << endl;
 		}
-		else if (aux_ult_consulta.presento == true) {
-			cout << "El paciente se presento a su ultimo turno, el cual fue hace menos de 10 años. No hace falta llamarlo." << endl;
-		}
+		
+
+		
 
 
 		//Asignar_Turno(lista[i], verificacion, lista2, lista1, &contador2, &contador3);
 
 		tam_lista_filtrada_consultas = 0;
-
+		cout << "\n" << endl;
 		//int aux3 = Encontrar_Consulta(lista_cons, lista[i], &contador6);
 		//cout << "La consulta mas actual es: " << aux3 << endl;
 		//contador6 = 0;
@@ -1620,7 +1965,12 @@ int main()
 	Contactos* lista3;
 	lista3 = read_archivo_contactos("Contactos.csv", &contador4);
 	
-	
+	for (int i = 0; i < contador - 1; i++) {
+		cout << "Paciente nro: " << i << endl;
+		cout << lista[i].dni << "," << lista[i].nombre << "," << lista[i].apellido << "," << lista[i].sexo << "," << lista[i].natalicio << "," << lista[i].estado << "," << lista[i].id_os << endl;
+
+	}//int aux2 = string_a_int(lista[i]);
+		//cout << "Es: " << aux2 << endl;
 
 	
 	Consultas* lista_cons;
@@ -1628,6 +1978,10 @@ int main()
 	Medicos* medico_nueva_consulta;
 	Medicos* medico_nueva_consulta_nuevo;
 
+	for (int i = 0; i < contador2 - 1; i++) {
+		cout << "Consulta nro: " << i + 1 << endl;
+		cout << lista1[i].dni_pac << "," << lista1[i].fecha_solicitado << "," << lista1[i].fecha_turno << "," << lista1[i].presento << "," << lista1[i].matricula_med << endl;
+	}
 	//los contador restan 1 porque sino imprime el ultimo 2 veces, ver si es solucion optima o no
 
 	Secretaria(lista, lista1, lista3, lista2, &contador, &contador2, &contador4, &contador3);
@@ -1657,11 +2011,13 @@ int main()
 		//contador6 = 0;
 	}*/
 
-	
-	//int aux = string_a_int(lista[1]);
-	for (int i = 0; i < contador2-1; i++) {
-		cout << lista1[i].dni_pac << "," << lista1[i].fecha_solicitado << "," << lista1[i].fecha_turno << "," << lista1[i].presento << "," << lista1[i].matricula_med << endl;
+	for (int i = 0; i < contador - 1; i++) {
+		cout << "Paciente nro: " << i << endl;
+		cout << lista[i].dni << "," << lista[i].nombre << "," << lista[i].apellido << "," << lista[i].sexo << "," << lista[i].natalicio << "," << lista[i].estado << "," << lista[i].id_os << endl;
+		//int aux2 = string_a_int(lista[i]);
+		//cout << "Es: " << aux2 << endl;
 	}
+	//int aux = string_a_int(lista[1]);
 	
 	for (int i = 0; i < contador3-1; i++) {
 		cout << lista2[i].matricula << "," << lista2[i].nombre << "," << lista2[i].apellido << "," << lista2[i].telefono << "," << lista2[i].especialidad << "," << lista2[i].activo  << endl;
