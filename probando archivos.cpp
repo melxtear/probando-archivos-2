@@ -80,9 +80,9 @@ typedef struct Pacientes {
 	string estado;
 	string id_os;
 	string archivado;
-	Consultas ultima_consulta;
-	Contactos contacto_emergencia;
-	Contactos contacto_paciente;
+	//Consultas ultima_consulta;
+	//Contactos contacto_emergencia;
+	//Contactos contacto_paciente;
 	//Contactos contacto;//tendria que tener 2? uno de emergencia y otra dle mismo paciente
 	//Consultas consulta;//consulta asociada, lee la del paciente
 
@@ -298,7 +298,7 @@ Contactos* read_archivo_contactos(string a1, int* contador4) {
 }
 
 //no funca
-void crear_archivo_consultas_nuevas(string nombre_a1, Consultas*& lista_consultas_nuevas, int* tamactual) {
+/*void crear_archivo_consultas_nuevas(string nombre_a1, Consultas*& lista_consultas_nuevas, int* tamactual) {
 	fstream archi;
 
 	archi.open(nombre_a1, ios::out);
@@ -327,6 +327,8 @@ void crear_archivo_consultas_nuevas(string nombre_a1, Consultas*& lista_consulta
 
 	return;
 }
+*/
+
 
 Consultas* read_archivo_nuevas_consultas(string a1) {
 	Consultas* l_cons = new Consultas[0];
@@ -499,7 +501,7 @@ void crear_archivo_lista_pacientes_nueva(string nombre_a1, Pacientes*& lista_pac
 }*/
 
 //ver si hace falta usar
-Pacientes* archivar_pacientes(Pacientes*& lista_pac_a_archivar, int* contador5, Pacientes pac_a_archivar, bool archivar_si) {
+/*Pacientes* archivar_pacientes(Pacientes*& lista_pac_a_archivar, int* contador5, Pacientes pac_a_archivar, bool archivar_si) {
 	Pacientes* l_pac = new Pacientes[0];
 	int tamactual = 0;
 	for (int i = 0; i <= 100; i++) {
@@ -513,7 +515,8 @@ Pacientes* archivar_pacientes(Pacientes*& lista_pac_a_archivar, int* contador5, 
 	*contador5 = tamactual;
 	return l_pac;
 }
- 
+ */
+
 Pacientes* read_archivo_pacientes_archivados(string a1) {
 	Pacientes* l_pac = new Pacientes[0];
 	Pacientes aux;
@@ -542,7 +545,7 @@ Pacientes* read_archivo_pacientes_archivados(string a1) {
 	return l_pac;
 }
 
-//no visto, no se si funciona
+//se usa
 Pacientes* read_archivo_lista_pacientes_nueva(string a1) {
 	Pacientes* l_pac = new Pacientes[0];
 	Pacientes aux;
@@ -704,6 +707,7 @@ tm* toInt(string cadena) {
 
 
 	}
+
 	ltm->tm_year = stoi(anio);
 	ltm->tm_mday = stoi(dia);
 	ltm->tm_mon = stoi(mes);
@@ -756,7 +760,7 @@ tm* toInt(string cadena) {
 
 }*/
 
-
+/*
 Contactos* filtrar_lista_por_dni_contactos(Contactos* lista_contactos, Pacientes pac, int* tamactual, int* tam) {
 	Contactos* l_cont = new Contactos[0];
 	int tamact = 0;
@@ -769,7 +773,7 @@ Contactos* filtrar_lista_por_dni_contactos(Contactos* lista_contactos, Pacientes
 	}
 	return l_cont;
 
-}
+}*/
 
 Consultas* filtrar_lista_por_dni(Consultas* lista_consultas, Pacientes pac, int* tamactual, int* tam) {
 	Consultas* l_cons = new Consultas[0];
@@ -802,7 +806,7 @@ tm* Encontrar_Consulta_Fecha(Consultas* lista_consultas_filtradas, int* tamactua
 
 		  if (aux1->tm_year < aux2->tm_year)
 			  aux1 = aux2;
-		  else if (aux1->tm_year < aux2->tm_year && aux1->tm_mon < aux2->tm_mon) 
+		  else if (aux1->tm_year < aux2->tm_year && aux1->tm_mon < aux2->tm_mon)
 			  aux1 = aux2;
 		  else if (aux1->tm_year < aux2->tm_year && aux1->tm_mon < aux2->tm_mon && aux1->tm_mday < aux2->tm_mday)
 			  aux1 = aux2;
@@ -973,7 +977,7 @@ int Verificar_Anio_Ultima_Consulta(tm* fecha_ultima_consulta) {
 	else if (nuevo->tm_year > 10)//la diferencia de años es mayor a los 10, se supero el limite
 		return 0;//ya se cumplieron los 10 años, es un paciente irrecuperable, procedemos a archivarlo
 	else if (nuevo->tm_year < 0)
-		return 2;
+		return 2; //paciente tiene turno actual
 	else if (nuevo->tm_year == 0) {
 		if (fecha_ultima_consulta->tm_mon > aux2->tm_mon)
 			return 2;
@@ -2060,7 +2064,7 @@ void LLamado_Secretaria(Pacientes* lista_pac, int* tam_pacientes, Pacientes* lis
 						cout << "Presento:" << "Se presento al ultimo turno." << endl;
 					}
 					else
-						cout << "Presento:" << "No se presento al ultimo turno." << endl;;
+						cout << "Presento:" << "No se presento al ultimo turno." << endl;
 				}
 				
 			}
@@ -2152,7 +2156,7 @@ Pacientes* filtrar_verificacion_pacientes(Pacientes* lista_pac, int* tam_pacient
 	
 	Pacientes* l_pac = new Pacientes[0];
 	int tam_lista_filtrada_consultas = 0;
-	Consultas* lista_cons;
+	Consultas* lista_cons=NULL;
 	Contactos* contacto_paciente_a_llamar=NULL;
 	Contactos* contacto_paciente_a_llamar_emergencia = NULL;
 
@@ -2169,7 +2173,7 @@ Pacientes* filtrar_verificacion_pacientes(Pacientes* lista_pac, int* tam_pacient
 
 			int verificacion_anio_ultima_consulta = Verificar_Anio_Ultima_Consulta(aux3);
 
-			if (verificacion_anio_ultima_consulta == 1) { //paciente relativamente nuevo
+			if (verificacion_anio_ultima_consulta == 1) { //paciente relativamente nuevo, puede retornar
 
 				//int verificacion_estado_paciente = verificar_estado_paciente(lista_pac[i]);
 
@@ -2303,7 +2307,7 @@ Pacientes* filtrar_verificacion_pacientes(Pacientes* lista_pac, int* tam_pacient
 				//archivamos
 			}
 			else if (verificacion_anio_ultima_consulta == 2) {
-				cout << "El paciente ya tiene un turno proximo. Datos del turno: " << endl;
+				cout << "El paciente ya tiene un turno proximo. " << endl;
 				//no agrego nada
 			}
 			tam_lista_filtrada_consultas = 0;
@@ -2372,7 +2376,7 @@ int main()
 	lista_nueva_verificados = filtrar_verificacion_pacientes(lista, &contador, lista1, &contador2, lista3, &contador4, &contador5, lista_archivados, &contador_archivados);
 
 	//crear_archivo_nuevo_lista_verificados(string nombre_a1, Pacientes*& lista_pac, Consultas*& lista_cons, Contactos*& lista_contactos, int* tamactual, int* tam_consultas, int* tam_contactos) {
-	crear_archivo_nuevo_lista_verificados("Pacientes_Verificados_Secretaria.csv", lista_nueva_verificados, lista1, lista3, &contador5, &contador2, &contador4);
+	crear_archivo_nuevo_lista_verificados("Lista_Verificados_Pacientes.csv", lista_nueva_verificados, lista1, lista3, &contador5, &contador2, &contador4);
 	//crear_archivo_nuevo_lista_verificados(, lista_nueva_verificados, &contador5);
 
 
