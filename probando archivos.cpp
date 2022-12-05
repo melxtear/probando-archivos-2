@@ -329,7 +329,7 @@ Contactos* read_archivo_contactos(string a1, int* contador4) {
 }
 */
 
-
+/*
 Consultas* read_archivo_nuevas_consultas(string a1) {
 	Consultas* l_cons = new Consultas[0];
 	Consultas aux;
@@ -358,7 +358,7 @@ Consultas* read_archivo_nuevas_consultas(string a1) {
 
 	return l_cons;
 }
-
+*/
 void agregar_pacientes_archivados(Pacientes*& lista_pac, Pacientes paciente, int* tamactual) {
 	*tamactual = *tamactual + 1;
 	int i = 0;
@@ -825,7 +825,7 @@ Consultas* encontrar_ultima_consulta(Consultas* lista_consultas_filtradas, int* 
 
 	for (int i = 0; i < *tamactual; i++) {
 
-		
+
 		aux2 = toInt(lista_consultas_filtradas[i].fecha_turno);
 		//aux1.año=1980 aux1.mes= 7 aux1.dia=20
 		//aux2.año=1982 aux2.mes=8  aux1.dia=24
@@ -842,8 +842,8 @@ Consultas* encontrar_ultima_consulta(Consultas* lista_consultas_filtradas, int* 
 			aux1 = aux2;
 			aux = &lista_consultas_filtradas[i];
 		}
-		else
-			aux = &lista_consultas_filtradas[0];
+		else if(aux1->tm_year ==aux2->tm_year && aux1->tm_mon == aux2->tm_mon && aux1->tm_mday == aux2->tm_mday)
+			aux = &lista_consultas_filtradas[i];
 	}
 
 	return aux;
@@ -1468,20 +1468,17 @@ Contactos* buscar_contacto_pac(Contactos* lista_contactos, int* tam_contactos, P
 */
 
 void crear_archivo_nuevo_lista_verificados(string nombre_a1, Pacientes*& lista_pac, Consultas*& lista_cons, Contactos*& lista_contactos, int* tamactual, int* tam_consultas, int* tam_contactos) {
-	fstream archi, archi2;
+	fstream archi;
 	int tam_lista_filtrada_consultas = 0;
 
 	archi.open(nombre_a1, ios::out);
-	//archi2.open(nombre_a2, ios::out);
 	int i = 0;
 
-	//&& archi2.is_open()
 	if (archi.is_open()) {
 		archi << "dni , nombre , apellido , sexo , natalicio , estado , obra_social , fecha_ultima_consulta_solicitado , fecha_turno_ultima_consulta , ultima_consulta_presento, ultima_consulta_matricula_medico , telefono_paciente , celular_paciente , direccion_paciente , mail_paciente , telefono_emergencia , celular_emergencia , direccion_emergencia , mail_emergencia" << endl;
 		while (i < *tamactual) {
 			//dni , nombre , apellido , sexo , natalicio , estado , obra_social
-			Consultas* lista_cons_filtradas= filtrar_lista_por_dni(lista_cons, lista_pac[i], tam_consultas, &tam_lista_filtrada_consultas);
-			//tm* aux3 = Encontrar_Consulta_Fecha(lista_cons_filtradas, &tam_lista_filtrada_consultas);
+			Consultas* lista_cons_filtradas = filtrar_lista_por_dni(lista_cons, lista_pac[i], tam_consultas, &tam_lista_filtrada_consultas);
 			Consultas* aux_consultas = encontrar_ultima_consulta(lista_cons_filtradas, &tam_lista_filtrada_consultas);
 
 			Contactos* contacto_paciente_a_llamar = buscar_contacto_pac(lista_contactos, tam_contactos, lista_pac[i]);
@@ -1489,41 +1486,22 @@ void crear_archivo_nuevo_lista_verificados(string nombre_a1, Pacientes*& lista_p
 			if (contacto_paciente_a_llamar != NULL) {
 				contacto_paciente_a_llamar_emergencia = buscar_contacto_emergencia(lista_contactos, tam_contactos, lista_pac[i], contacto_paciente_a_llamar);
 				if (contacto_paciente_a_llamar_emergencia == NULL) {
-
-					//contacto_paciente_a_llamar_emergencia->telefono = "";
-					//contacto_paciente_a_llamar_emergencia->celular = "";
-					//contacto_paciente_a_llamar_emergencia->direccion = "";
-					//contacto_paciente_a_llamar_emergencia->dni_pac = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-					//contacto_paciente_a_llamar_emergencia->mail = "";
-					archi << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << aux_consultas->fecha_solicitado << " , " << aux_consultas->fecha_turno << " , " << aux_consultas->presento << " , " << aux_consultas->matricula_med << " , " << contacto_paciente_a_llamar->telefono << " , " << contacto_paciente_a_llamar->celular << " , " << contacto_paciente_a_llamar->direccion << " , " << contacto_paciente_a_llamar->mail << "\n";
+					//archi << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << aux_consultas->fecha_solicitado << " , " << aux_consultas->fecha_turno << " , " << aux_consultas->presento << " , " << aux_consultas->matricula_med << " , " << contacto_paciente_a_llamar->telefono << " , " << contacto_paciente_a_llamar->celular << " , " << contacto_paciente_a_llamar->direccion << " , " << contacto_paciente_a_llamar->mail << "\n";
+					archi << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << aux_consultas->fecha_solicitado << " , " << aux_consultas->fecha_turno << " , " << aux_consultas->presento << " , " << aux_consultas->matricula_med << " , " << contacto_paciente_a_llamar->telefono << " , " << contacto_paciente_a_llamar->celular << " , " << contacto_paciente_a_llamar->direccion << " , " << contacto_paciente_a_llamar->mail << " , " << "SIN INFORMACION TELEFONO EMERGENCIA" << " , " << "SIN INFORMACION CELULAR EMERGENCIA" << " , " << "SIN INFORMACION DIRECCION EMERGENCIA" << " , " << "SIN INFORMACION MAIL EMERGENCIA" << "\n";
 
 				}
 				else
 					archi << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << aux_consultas->fecha_solicitado << " , " << aux_consultas->fecha_turno << " , " << aux_consultas->presento << " , " << aux_consultas->matricula_med << " , " << contacto_paciente_a_llamar->telefono << " , " << contacto_paciente_a_llamar->celular << " , " << contacto_paciente_a_llamar->direccion << " , " << contacto_paciente_a_llamar->mail << " , " << contacto_paciente_a_llamar_emergencia->telefono << " , " << contacto_paciente_a_llamar_emergencia->celular << " , " << contacto_paciente_a_llamar_emergencia->direccion << " , " << contacto_paciente_a_llamar_emergencia->mail << "\n";
-
 			}
 			else {
 				contacto_paciente_a_llamar_emergencia = buscar_contacto_emergencia(lista_contactos, tam_contactos, lista_pac[i], contacto_paciente_a_llamar);
-				
-				if (contacto_paciente_a_llamar_emergencia == NULL) {
-					archi << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << aux_consultas->fecha_solicitado << " , " << aux_consultas->fecha_turno << " , " << aux_consultas->presento << " , " << aux_consultas->matricula_med << "\n";
 
-					//contacto_paciente_a_llamar->telefono = "";
-					//contacto_paciente_a_llamar->celular = "";
-					//contacto_paciente_a_llamar->direccion = "";
-					//contacto_paciente_a_llamar->dni_pac = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-					//contacto_paciente_a_llamar->mail = "";
-					
-					//contacto_paciente_a_llamar_emergencia->telefono = "";
-					//contacto_paciente_a_llamar_emergencia->celular = "";
-					//contacto_paciente_a_llamar_emergencia->direccion = "";
-					//contacto_paciente_a_llamar_emergencia->dni_pac = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-					//contacto_paciente_a_llamar_emergencia->mail = "";
+				if (contacto_paciente_a_llamar_emergencia == NULL) {
+					archi << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << aux_consultas->fecha_solicitado << " , " << aux_consultas->fecha_turno << " , " << aux_consultas->presento << " , " << aux_consultas->matricula_med << " , " << "SIN INFORMACION TELEFONO PACIENTE" << " , " << "SIN INFORMACION CELULAR PACIENTE" << " , " << "SIN INFORMACION DIRECCION PACIENTE" << " , " << "SIN INFORMACION MAIL PACIENTE" << " , " << "SIN INFORMACION TELEFONO EMERGENCIA" << " , " << "SIN INFORMACION CELULAR EMERGENCIA" << " , " << "SIN INFORMACION DIRECCION EMERGENCIA" << " , " << "SIN INFORMACION MAIL EMERGENCIA" << "\n";
+					//archi << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << aux_consultas->fecha_solicitado << " , " << aux_consultas->fecha_turno << " , " << aux_consultas->presento << " , " << aux_consultas->matricula_med << "\n";
 				}
-				
+
 			}
-			//cout << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << aux_consultas->fecha_solicitado << " , " << aux_consultas->fecha_turno << " , " << aux_consultas->presento << " , " << aux_consultas->matricula_med << " , " << contacto_paciente_a_llamar->telefono << " , " << contacto_paciente_a_llamar->celular << " , " << contacto_paciente_a_llamar->direccion << " , " << contacto_paciente_a_llamar->mail << " , " << contacto_paciente_a_llamar_emergencia->telefono << " , " << contacto_paciente_a_llamar_emergencia->celular << " , " << contacto_paciente_a_llamar_emergencia->direccion << " , " << contacto_paciente_a_llamar_emergencia->mail << endl;
-			//archi << lista_pac[i].dni << " , " << lista_pac[i].nombre << " , " << lista_pac[i].apellido << " , " << lista_pac[i].sexo << " , " << lista_pac[i].natalicio << " , " << lista_pac[i].estado << " , " << lista_pac[i].id_os << " , " << aux_consultas->fecha_solicitado << " , " << aux_consultas->fecha_turno << " , " << aux_consultas->presento << " , " << aux_consultas->matricula_med << " , " << contacto_paciente_a_llamar->telefono << " , " << contacto_paciente_a_llamar->celular << " , " << contacto_paciente_a_llamar->direccion << " , " << contacto_paciente_a_llamar->mail << " , " << contacto_paciente_a_llamar_emergencia->telefono << " , " << contacto_paciente_a_llamar_emergencia->celular << " , " << contacto_paciente_a_llamar_emergencia->direccion << " , " << contacto_paciente_a_llamar_emergencia->mail << "\n";
 			i++;
 			tam_lista_filtrada_consultas = 0;
 		}
@@ -1603,7 +1581,7 @@ int verificar_anio_2(tm* fecha_ultima_consulta) {
 			}
 		}
 		else if (nuevo->tm_year < 5)
-			return 1; //no hace falta llamar, pacientr activo
+			return 0; //no hace falta llamar, pacientr activo
 	}
 	else
 		return 2;//ocurrio algo raro, 2 significa que no esta en  ningun rango. Es raro porque significa que es mayor a 10 o menor a o y ya habia
@@ -1834,7 +1812,7 @@ void LLamado_Secretaria(Pacientes* lista_pac, int* tam_pacientes, Pacientes* lis
 			int verificacion_anio_ultima_consulta = Verificar_Anio_Ultima_Consulta(aux3);
 			//ultima_consulta = encontrar_ultima_consulta(lista_cons, &tam_lista_filtrada);
 
-			if (verificacion_anio_ultima_consulta == 1) { //paciente relativamente nuevo
+			//if (verificacion_anio_ultima_consulta == 1) { //paciente relativamente nuevo
 
 				if (aux_ult_consulta->presento == false) {
 					cout << "Datos ultima consulta del paciente: " << endl;
@@ -2050,24 +2028,234 @@ void LLamado_Secretaria(Pacientes* lista_pac, int* tam_pacientes, Pacientes* lis
 						agregar_pacientes_archivados(*&lista_pac_archivados, lista_nueva_verificados[i], tam_lista_archivados);
                     }
 						
-				}
-				else {
-					cout << "El paciente se presento a su ultimo turno, el cual fue hace menos de 10 años." << endl;
+				}else {
+					int aux_anio2 = verificar_anio_2(aux3);
 
-					
-					cout << "Datos ultima consulta del paciente: " << endl;
-					cout << "Dni: " << aux_ult_consulta->dni_pac << endl;
-					cout << "Fecha solicitado del turno: " << aux_ult_consulta->fecha_solicitado << endl;
-					cout << "Fecha del turno: " << aux_ult_consulta->fecha_turno << endl;
-					cout << "Matricula del medico: " << aux_ult_consulta->matricula_med << endl;
-					if (aux_ult_consulta->presento == true) {
-						cout << "Presento:" << "Se presento al ultimo turno." << endl;
+					if (aux_anio2 == 1) {
+						cout << "Aunque el paciente asistio hace menos de 10 anios a su ultimo, la ultima actividad de este fue hace mas de 5 anios" << endl;
+						cout << "Paciente recuperable, procedemos a buscar algun contacto telefonico y llamar. " << endl;
+
+						contacto_paciente_a_llamar = buscar_contacto_pac(lista_contactos, tam_contactos, lista_nueva_verificados[i]);
+
+						if (contacto_paciente_a_llamar != NULL) {
+							cout << "Encontramos contacto del paciente, los datos son los siguientes: " << endl;
+
+							cout << "Dni del paciente: " << contacto_paciente_a_llamar->dni_pac << ", " << "Telefono: " << contacto_paciente_a_llamar->telefono << ", "
+								<< "Celular: " << contacto_paciente_a_llamar->celular << ", " << "Direccion: " << contacto_paciente_a_llamar->direccion
+								<< ", " << "E-Mail: " << contacto_paciente_a_llamar->mail << endl;
+
+							cout << "Llamando al paciente.." << endl;
+
+							int respuesta_llamado_paciente = rand() % 2;
+
+							if (respuesta_llamado_paciente) {
+								cout << "El paciente ha respondido al llamado. Procedemos a consultar sobre la posibilidad de tener un nuevo turno en nuestro centro medico" << endl;
+
+								int respuesta_pac_nuevo_turno = rand() % 2;
+
+								if (respuesta_pac_nuevo_turno) {
+									cout << "El paciente quiere un nuevo turno en nuestro centro medico." << endl;
+									medico_nueva_consulta = Asignar_Medico(lista_medicos, lista_cons, &tam_lista_filtrada_consultas, tam_medicos);
+
+									if (medico_nueva_consulta != NULL) {
+										cout << "Ya asignamos con exito al medico de su proxima consulta, procedemos a dar una fecha del turno. " << endl;
+										fecha_nuevo_turno = fecha_nuevo_turno_random();
+
+
+										/*time_t curr_time;
+										tm* curr_tm;
+										char date_string1[100];
+										char date_string2[100];
+
+										time(&curr_time);
+										curr_tm = localtime(&curr_time);
+
+										strftime(date_string1, 50, "%d/%m/%Y", curr_tm);*/
+										string date_string1 = fecha_de_hoy();
+										string date_string2 = fecha_turno(fecha_nuevo_turno);
+										/*
+										time_t curr_time2;
+										tm* curr_tm2;
+										time(&curr_time2);
+										curr_tm2 = localtime(&curr_time2);
+
+
+										curr_tm2->tm_year = 2023;
+										curr_tm2->tm_mon = fecha_nuevo_turno->tm_mon;
+										curr_tm2->tm_mday = fecha_nuevo_turno->tm_mday;
+
+										strftime(date_string2, 50, "%d/%m/2023", curr_tm2); //ver*/
+										nueva_consulta.fecha_solicitado = date_string1;
+										nueva_consulta.fecha_turno = date_string2;
+										nueva_consulta.matricula_med = medico_nueva_consulta->matricula;
+										nueva_consulta.dni_pac = lista_nueva_verificados[i].dni;
+										nueva_consulta.presento = false;
+
+										Imprimir_Datos_Consulta(nueva_consulta, lista_nueva_verificados[i], tam_pacientes_verificados);
+
+										agregar_consultas_extra(nueva_consulta, "Consultas.csv", tam_consultas);
+
+										/*cout << "Datos de la nueva consulta: " << endl;
+										cout << "DNI del paciente: " << nueva_consulta.dni_pac << endl;
+										cout << "Fecha en la cual se solicito el turno: " << nueva_consulta.fecha_solicitado << endl;
+										cout << "Fecha del turno: " << nueva_consulta.fecha_turno << endl;
+										cout << "Matricula del medico del proximo turno: " << nueva_consulta.matricula_med << endl;
+										cout << "Se presento el paciente?: " << nueva_consulta.presento << endl;
+										string nueva_obra=Verificar_Datos_Paciente(lista_pac[i]);
+										cout << "Obra social nueva: " << nueva_obra << endl;*/
+
+
+									}
+									//else
+										//cout << "Hubo problemas para asignar un medico con disponibilidad, volveremos a llamar al paciente en unos dias. " << endl;
+								}
+								else {
+									cout << "El paciente no está interesado en obtener un nuevo turno en nuestro centro medico, archivamos su historial. " << endl;
+									agregar_pacientes_archivados(*&lista_pac_archivados, lista_nueva_verificados[i], tam_lista_archivados);
+									//aca habria que llamar a la funcion de archivar
+								}
+
+							}
+							else {
+								cout << "El paciente no ha respondido al llamado, procedemos a llamar a su contacto de emergencia con el fin de dar con el paciente. " << endl;
+								contacto_paciente_a_llamar_emergencia = buscar_contacto_emergencia(lista_contactos, tam_contactos, lista_nueva_verificados[i], contacto_paciente_a_llamar);
+
+								if (contacto_paciente_a_llamar_emergencia != NULL) {
+									cout << "Encontramos al contacto de emergencia, sus datos son: " << endl;
+
+									cout << "Dni del paciente: " << contacto_paciente_a_llamar_emergencia->dni_pac << ", " << "Telefono del contacto: " << contacto_paciente_a_llamar_emergencia->telefono << ", "
+										<< "Celular del contacto: " << contacto_paciente_a_llamar->celular << ", " << "Direccion del contacto: " << contacto_paciente_a_llamar->direccion
+										<< ", " << "E-Mail del contacto: " << contacto_paciente_a_llamar->mail << endl;
+
+									cout << "Llamando al contacto de emergencia.. " << endl;
+
+									int respuesta_contacto_emergencia = rand() % 2;
+									if (respuesta_contacto_emergencia) {
+										cout << "El contacto ha respondido al llamado, procedemos a consultar sobre como se encuentra el paciente y porque no atendio, con el fin de asignar un nuevo turno" << endl;
+
+										int respuesta_estado_pac = rand() % 3;//0 esta vivo, no atendio porque estaba ocupado, procedemos a llamarlo y ya directo asignar turnp
+										//1 fallecio, procedemos a archivar y modificar su estado a fallecido
+										//2 internado, procedemos a dejar en standby y llamar cuando se encuentre mejor, modificamos estado
+
+										if (respuesta_estado_pac == 0) {
+											cout << "El paciente se encuentra bien, procedemos a llamarlo y ver la posibilidad de que agende un nuevo turno. " << endl;
+											int respuesta_pac_nuevo_turno2 = rand() % 2;
+
+											if (respuesta_pac_nuevo_turno2) {
+												cout << "El paciente quiere un nuevo turno en nuestro centro medico." << endl;
+												medico_nueva_consulta = Asignar_Medico(lista_medicos, lista_cons, &tam_lista_filtrada_consultas, tam_medicos);
+
+												if (medico_nueva_consulta != NULL) {
+													cout << "Ya asignamos con exito al medico de su proxima consulta, procedemos a dar una fecha del turno. " << endl;
+													fecha_nuevo_turno = fecha_nuevo_turno_random();
+
+
+													/*time_t curr_time;
+													tm* curr_tm;
+													char date_string1[100];
+													char date_string2[100];
+
+													time(&curr_time);
+													curr_tm = localtime(&curr_time);
+
+													strftime(date_string1, 50, "%d/%m/%Y", curr_tm);*/
+													string date_string1 = fecha_de_hoy();
+													string date_string2 = fecha_turno(fecha_nuevo_turno);
+													/*
+													time_t curr_time2;
+													tm* curr_tm2;
+													time(&curr_time2);
+													curr_tm2 = localtime(&curr_time2);
+
+
+													curr_tm2->tm_year = 2023;
+													curr_tm2->tm_mon = fecha_nuevo_turno->tm_mon;
+													curr_tm2->tm_mday = fecha_nuevo_turno->tm_mday;
+
+													strftime(date_string2, 50, "%d/%m/2023", curr_tm2); //ver*/
+													nueva_consulta.fecha_solicitado = date_string1;
+													nueva_consulta.fecha_turno = date_string2;
+													nueva_consulta.matricula_med = medico_nueva_consulta->matricula;
+													nueva_consulta.dni_pac = lista_nueva_verificados[i].dni;
+													nueva_consulta.presento = false;
+
+													Imprimir_Datos_Consulta(nueva_consulta, lista_nueva_verificados[i], tam_pacientes_verificados);
+
+													agregar_consultas_extra(nueva_consulta, "Consultas.csv", tam_consultas);
+													/*cout << "Datos de la nueva consulta: " << endl;
+													cout << "DNI del paciente: " << nueva_consulta.dni_pac << endl;
+													cout << "Fecha en la cual se solicito el turno: " << nueva_consulta.fecha_solicitado << endl;
+													cout << "Fecha del turno: " << nueva_consulta.fecha_turno << endl;
+													cout << "Matricula del medico del proximo turno: " << nueva_consulta.matricula_med << endl;
+													cout << "Se presento el paciente?: " << nueva_consulta.presento << endl;
+													string nueva_obra=Verificar_Datos_Paciente(lista_pac[i]);
+													cout << "Obra social nueva: " << nueva_obra << endl;*/
+
+												}
+												//else
+												//	cout << "Hubo problemas para asignar un medico con disponibilidad, volveremos a llamar al paciente en unos dias. " << endl;
+											}
+											else {
+												cout << "El paciente no está interesado en obtener un nuevo turno en nuestro centro medico, archivamos su historial. " << endl;
+												agregar_pacientes_archivados(*&lista_pac_archivados, lista_nueva_verificados[i], tam_lista_archivados);
+												//aca habria que llamar a la funcion de archivar
+											}
+										}
+										else if (respuesta_estado_pac == 1) {
+											lista_nueva_verificados[i].estado = "fallecido";
+											cout << "El contacto nos informa que el paciente ha fallecido, archivamos su historial." << endl;
+											agregar_pacientes_archivados(*&lista_pac_archivados, lista_nueva_verificados[i], tam_lista_archivados);
+											//funcion de archivar
+
+										}
+										else {
+											cout << "El contacto nos informa que el paciente se encuentra internado, modificamos el archivo y procedemos a llamar mas adelante" << endl;
+											lista_nueva_verificados[i].estado = "internado";
+										}
+
+									}
+									else {
+										cout << "El contacto de emergencia no ha respondido al llamado. Enviamos un email a ambos contactos con el fin de recibir respuesta, de igual forma en unos dias llamamos al paciente otra vez. " << endl;
+										//dejamos en standby
+										cout << "Enviando email al paciente,  su correo es:" << contacto_paciente_a_llamar->mail << endl;
+										cout << "Enviando email al contacto de emergencia, su correo es: " << contacto_paciente_a_llamar_emergencia->mail << endl;
+									}
+								}
+								else {
+									cout << "No se encontró un contacto de emergencia, procedemos a enviar un email al paciente e intentar llamar en unos dias otra vez. " << endl;
+									cout << "Enviando email al paciente,  su correo es:" << contacto_paciente_a_llamar->mail << endl;
+									//dejamos en standby
+
+								}
+							}
+
+						}
+						else {
+							cout << "Ha ocurrido un error y no se ha podido encontrar información de contacto del paciente. Archivamos por falta de informacion. " << endl;
+							agregar_pacientes_archivados(*&lista_pac_archivados, lista_nueva_verificados[i], tam_lista_archivados);
+						}
+
+
 					}
-					else
-						cout << "Presento:" << "No se presento al ultimo turno." << endl;
+					else if (aux_anio2 == 0) {
+						cout << "El paciente se presento a su ultimo turno, el cual fue hace menos de 10 años." << endl;
+
+						if (verificar_anio_2)
+						cout << "Datos ultima consulta del paciente: " << endl;
+						cout << "Dni: " << aux_ult_consulta->dni_pac << endl;
+						cout << "Fecha solicitado del turno: " << aux_ult_consulta->fecha_solicitado << endl;
+						cout << "Fecha del turno: " << aux_ult_consulta->fecha_turno << endl;
+						cout << "Matricula del medico: " << aux_ult_consulta->matricula_med << endl;
+						if (aux_ult_consulta->presento == true) {
+							cout << "Presento:" << "Se presento al ultimo turno." << endl;
+						}
+						else
+							cout << "Presento:" << "No se presento al ultimo turno." << endl;
+					}
 				}
 				
-			}
+			//}
+			/*
 			else if (verificacion_anio_ultima_consulta == 0) {
 				cout << "El paciente se atendio hace mas de 10 años, es un paciente irrecuperable. Archivamos su historial. " << endl;
 				agregar_pacientes_archivados(*&lista_pac_archivados, lista_nueva_verificados[i], tam_lista_archivados);
@@ -2089,15 +2277,16 @@ void LLamado_Secretaria(Pacientes* lista_pac, int* tam_pacientes, Pacientes* lis
 
 				cout << "Es un paciente activo. No hace falta llamar ni archivar. " << endl;
 			}
-			
+			*/
 
 		}
 		else if (verificacion_estado_paciente == 1) {//paciente internado segun historial
 			cout << "El paciente se encuentra fallecido, archivamos su historial. " << endl;
 			agregar_pacientes_archivados(*&lista_pac_archivados, lista_nueva_verificados[i], tam_lista_archivados);
-			//archivamos
+			//archivamos, cambiamos estado del paciente
 		}
 		else if (verificacion_estado_paciente == 0) {//paciente fallecido segun historial
+			//cambiamos estado del paciente
 			cout << "El paciente se encuentra internado en nuestro centro medico, llamamos mas adelante. " << endl;
 		}
 		
@@ -2151,7 +2340,7 @@ void LLamado_Secretaria(Pacientes* lista_pac, int* tam_pacientes, Pacientes* lis
 	}
 }
 	
-//terminar funcion, habria que ver del struct de paciente que tenga contacto y acceda a los de emergencia y eso
+
 Pacientes* filtrar_verificacion_pacientes(Pacientes* lista_pac, int* tam_pacientes, Consultas* lista_consultas, int* tam_consultas, Contactos* lista_contactos, int* tam_contactos, int* tam_lista_nueva_pacientes, Pacientes*& lista_pac_archivados, int* tam_lista_archivados) {
 	
 	Pacientes* l_pac = new Pacientes[0];
@@ -2179,54 +2368,6 @@ Pacientes* filtrar_verificacion_pacientes(Pacientes* lista_pac, int* tam_pacient
 
 				//if (verificacion_estado_paciente == 2) {
 					if (aux_ult_consulta->presento == false) {//no se presento a su ultimo turno, y segun historial esta vivo
-						/*
-						lista_pac[i].ultima_consulta.dni_pac = lista_pac->dni;
-						lista_pac[i].ultima_consulta.fecha_solicitado = aux_ult_consulta->fecha_solicitado;
-						lista_pac[i].ultima_consulta.fecha_turno = aux_ult_consulta->fecha_turno;
-						lista_pac[i].ultima_consulta.matricula_med = aux_ult_consulta->matricula_med;
-						lista_pac[i].ultima_consulta.presento = aux_ult_consulta->presento;
-						*/
-						contacto_paciente_a_llamar = buscar_contacto_pac(lista_contactos, tam_contactos, lista_pac[i]);
-						contacto_paciente_a_llamar_emergencia = buscar_contacto_emergencia(lista_contactos, tam_contactos, lista_pac[i], contacto_paciente_a_llamar);
-						/*if (contacto_paciente_a_llamar != NULL && contacto_paciente_a_llamar_emergencia != NULL) {
-							lista_pac[i].contacto_paciente.telefono = contacto_paciente_a_llamar->telefono;
-							lista_pac[i].contacto_paciente.celular = contacto_paciente_a_llamar->celular;
-							lista_pac[i].contacto_paciente.direccion = contacto_paciente_a_llamar->direccion;
-							lista_pac[i].contacto_paciente.dni_pac = contacto_paciente_a_llamar->dni_pac;
-							lista_pac[i].contacto_paciente.mail = contacto_paciente_a_llamar->mail;
-
-							lista_pac[i].contacto_emergencia.telefono = contacto_paciente_a_llamar_emergencia->telefono;
-							lista_pac[i].contacto_emergencia.celular = contacto_paciente_a_llamar_emergencia->celular;
-							lista_pac[i].contacto_emergencia.direccion = contacto_paciente_a_llamar_emergencia->direccion;
-							lista_pac[i].contacto_emergencia.dni_pac = contacto_paciente_a_llamar_emergencia->dni_pac;
-							lista_pac[i].contacto_emergencia.mail = contacto_paciente_a_llamar_emergencia->mail;
-						}
-						else if (contacto_paciente_a_llamar != NULL && contacto_paciente_a_llamar_emergencia == NULL) {
-							lista_pac[i].contacto_paciente.telefono = contacto_paciente_a_llamar->telefono;
-							lista_pac[i].contacto_paciente.celular = contacto_paciente_a_llamar->celular;
-							lista_pac[i].contacto_paciente.direccion = contacto_paciente_a_llamar->direccion;
-							lista_pac[i].contacto_paciente.dni_pac = contacto_paciente_a_llamar->dni_pac;
-							lista_pac[i].contacto_paciente.mail = contacto_paciente_a_llamar->mail;
-
-							lista_pac[i].contacto_emergencia.telefono = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							lista_pac[i].contacto_emergencia.celular = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							lista_pac[i].contacto_emergencia.direccion = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							lista_pac[i].contacto_emergencia.dni_pac = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							lista_pac[i].contacto_emergencia.mail = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-						}
-						else if (contacto_paciente_a_llamar == NULL && contacto_paciente_a_llamar_emergencia == NULL) {
-							lista_pac[i].contacto_paciente.telefono = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-							lista_pac[i].contacto_paciente.celular = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-							lista_pac[i].contacto_paciente.direccion = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-							lista_pac[i].contacto_paciente.dni_pac = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-							lista_pac[i].contacto_paciente.mail = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-
-							lista_pac[i].contacto_emergencia.telefono = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							lista_pac[i].contacto_emergencia.celular = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							lista_pac[i].contacto_emergencia.direccion = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							lista_pac[i].contacto_emergencia.dni_pac = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							lista_pac[i].contacto_emergencia.mail = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";*/
-						//crear_archivo_nuevo_lista_verificados("Pacientes_Verificados.csv", lista_pac[i], contacto_paciente_a_llamar_emergencia);
 						agregar_pacientes(l_pac, lista_pac[i], tam_lista_nueva_pacientes);
 					}
 					else if (aux_ult_consulta->presento == true) {
@@ -2234,55 +2375,7 @@ Pacientes* filtrar_verificacion_pacientes(Pacientes* lista_pac, int* tam_pacient
 
 						int segunda_verificacion = verificar_anio_2(aux3); //habria que ver si es menor a 5 años de actividad
 						if (segunda_verificacion == 1)//podemos llamar
-						{/*
-							lista_pac[i].ultima_consulta.dni_pac = lista_pac->dni;
-							lista_pac[i].ultima_consulta.fecha_solicitado = aux_ult_consulta->fecha_solicitado;
-							lista_pac[i].ultima_consulta.fecha_turno = aux_ult_consulta->fecha_turno;
-							lista_pac[i].ultima_consulta.matricula_med = aux_ult_consulta->matricula_med;
-							lista_pac[i].ultima_consulta.presento = aux_ult_consulta->presento;
-							*/
-							contacto_paciente_a_llamar = buscar_contacto_pac(lista_contactos, tam_contactos, lista_pac[i]);
-							contacto_paciente_a_llamar_emergencia = buscar_contacto_emergencia(lista_contactos, tam_contactos, lista_pac[i], contacto_paciente_a_llamar);
-							/*if (contacto_paciente_a_llamar != NULL && contacto_paciente_a_llamar_emergencia != NULL) {
-								lista_pac[i].contacto_paciente.telefono = contacto_paciente_a_llamar->telefono;
-								lista_pac[i].contacto_paciente.celular = contacto_paciente_a_llamar->celular;
-								lista_pac[i].contacto_paciente.direccion = contacto_paciente_a_llamar->direccion;
-								lista_pac[i].contacto_paciente.dni_pac = contacto_paciente_a_llamar->dni_pac;
-								lista_pac[i].contacto_paciente.mail = contacto_paciente_a_llamar->mail;
-
-								lista_pac[i].contacto_emergencia.telefono = contacto_paciente_a_llamar_emergencia->telefono;
-								lista_pac[i].contacto_emergencia.celular = contacto_paciente_a_llamar_emergencia->celular;
-								lista_pac[i].contacto_emergencia.direccion = contacto_paciente_a_llamar_emergencia->direccion;
-								lista_pac[i].contacto_emergencia.dni_pac = contacto_paciente_a_llamar_emergencia->dni_pac;
-								lista_pac[i].contacto_emergencia.mail = contacto_paciente_a_llamar_emergencia->mail;
-							}
-							else if (contacto_paciente_a_llamar != NULL && contacto_paciente_a_llamar_emergencia == NULL) {
-								lista_pac[i].contacto_paciente.telefono = contacto_paciente_a_llamar->telefono;
-								lista_pac[i].contacto_paciente.celular = contacto_paciente_a_llamar->celular;
-								lista_pac[i].contacto_paciente.direccion = contacto_paciente_a_llamar->direccion;
-								lista_pac[i].contacto_paciente.dni_pac = contacto_paciente_a_llamar->dni_pac;
-								lista_pac[i].contacto_paciente.mail = contacto_paciente_a_llamar->mail;
-
-								lista_pac[i].contacto_emergencia.telefono = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-								lista_pac[i].contacto_emergencia.celular = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-								lista_pac[i].contacto_emergencia.direccion = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-								lista_pac[i].contacto_emergencia.dni_pac = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-								lista_pac[i].contacto_emergencia.mail = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							}
-							else if (contacto_paciente_a_llamar == NULL && contacto_paciente_a_llamar_emergencia == NULL) {
-								lista_pac[i].contacto_paciente.telefono = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-								lista_pac[i].contacto_paciente.celular = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-								lista_pac[i].contacto_paciente.direccion = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-								lista_pac[i].contacto_paciente.dni_pac = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-								lista_pac[i].contacto_paciente.mail = "SIN INFORMACION DE CONTACTO DEL PACIENTE";
-
-								lista_pac[i].contacto_emergencia.telefono = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-								lista_pac[i].contacto_emergencia.celular = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-								lista_pac[i].contacto_emergencia.direccion = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-								lista_pac[i].contacto_emergencia.dni_pac = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-								lista_pac[i].contacto_emergencia.mail = "SIN INFORMACION DE CONTACTO DE EMERGENCIA";
-							}*/
-							//crear_archivo_nuevo_lista_verificados("Pacientes_Verificados.csv", lista_pac[i], contacto_paciente_a_llamar_emergencia);
+						{
 							agregar_pacientes(l_pac, lista_pac[i], tam_lista_nueva_pacientes);
 						}
 						//else if(segunda_verificacion == 0)
@@ -2376,7 +2469,7 @@ int main()
 	lista_nueva_verificados = filtrar_verificacion_pacientes(lista, &contador, lista1, &contador2, lista3, &contador4, &contador5, lista_archivados, &contador_archivados);
 
 	//crear_archivo_nuevo_lista_verificados(string nombre_a1, Pacientes*& lista_pac, Consultas*& lista_cons, Contactos*& lista_contactos, int* tamactual, int* tam_consultas, int* tam_contactos) {
-	crear_archivo_nuevo_lista_verificados("Lista_Verificados_Pacientes.csv", lista_nueva_verificados, lista1, lista3, &contador5, &contador2, &contador4);
+	crear_archivo_nuevo_lista_verificados("Pacientes_Verificados_Secretaria.csv", lista_nueva_verificados, lista1, lista3, &contador5, &contador2, &contador4);
 	//crear_archivo_nuevo_lista_verificados(, lista_nueva_verificados, &contador5);
 
 
